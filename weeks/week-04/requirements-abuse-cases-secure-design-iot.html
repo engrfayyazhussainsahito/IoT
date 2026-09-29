@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Requirements, Abuse Cases & Secure Design for IoT Products · IoT &amp; CPS Security</title>
+<meta name="description" content="Write abuse cases alongside functional requirements for a device feature.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-04/requirements-abuse-cases-secure-design-iot" data-title="Requirements, Abuse Cases & Secure Design for IoT Products" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-04/index.html">Week 04</a> / Requirements, Abuse Cases & Secure Design for IoT Products</nav>
+<article class="article">
+  <span class="kicker">Week 04 · Lesson 2 · Core</span>
+  <h1>Requirements, Abuse Cases & Secure Design for IoT Products</h1>
+  <p class="lede">Write abuse cases alongside functional requirements for a device feature.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">A functional requirement describes what a system should do. An abuse case describes
+  what happens when someone tries to make it do something else. Writing both together, from the start, is one
+  of the cheapest and most effective security investments a product team can make.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Write abuse cases alongside functional requirements for a device feature.</li><li>Apply secure-design patterns specific to constrained products.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–3 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>An abuse case follows a simple template: given an actor with some level of access, describe an
+  action they could take that violates an intended security property, and what the consequence would be. Writing
+  these alongside functional requirements — not as a separate, later "security review" — surfaces design flaws
+  while they're still cheap to fix.</p>
+  <p><b>Secure defaults</b> are the design-pattern payoff of this exercise: a device should ship in its most
+  secure reasonable configuration out of the box, requiring a deliberate action to weaken security (like
+  disabling a firewall rule), rather than requiring a deliberate action to enable it.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  FR[Functional requirement:\n'User can unlock door remotely'] --> AC[Abuse case:\n'Attacker on same Wi-Fi spoofs unlock command']
+  AC --> M[Mitigation:\nauthenticated, encrypted command channel]
+  M --> FR2[Updated requirement:\nincludes auth + encryption]</pre><div class="diagram-caption">Every functional requirement involving a security-relevant action should get this treatment.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Abuse-case writing</li><li>Secure defaults for consumer IoT</li><li>Design reviews with a hardware bill of materials</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a design-review ratio worth tracking: for every functional requirement
+  touching authentication, authorization, or physical actuation, there should be at least one paired abuse case
+  in the requirements document. A ratio near zero suggests abuse-case writing isn't actually happening.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example abuse case for a smart lock's "remote unlock" feature: <em>Actor</em>: an
+  attacker on the same local network as the lock's gateway. <em>Action</em>: replay a previously captured unlock
+  command. <em>Consequence</em>: unauthorized physical entry. <em>Mitigation</em>: include a nonce or timestamp
+  in the command, rejected if reused or stale.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">ABUSE CASE TEMPLATE
+Actor:          Who is attempting the abuse? (network position, access level)
+Action:         What do they attempt to do?
+Violated property: Confidentiality / Integrity / Availability / Safety?
+Consequence:    What's the real-world impact if they succeed?
+Mitigation:     What design change prevents or limits this?
+Residual risk:  What remains even after the mitigation?</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Abuse cases written during requirements are dramatically cheaper to address than
+  vulnerabilities found during a pre-launch pentest or, worse, after release — the same design flaw costs
+  roughly an order of magnitude more to fix at each later stage of development.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Product teams that integrate abuse-case writing into their existing requirements
+  process (rather than bolting on a separate "security requirements" document) see much better adoption, since
+  it becomes part of normal product-definition work rather than an extra step engineers can skip.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Structured abuse-case and misuse-case modeling has an established academic lineage
+  in requirements engineering research, predating and informing modern threat-modeling practice.</p>
+
+  <h2>13. Case Study</h2>
+  <p>The replay-attack abuse case for remote-unlock features described above mirrors real,
+  publicly documented smart-lock vulnerabilities where captured unlock signals could be replayed due to missing
+  nonce or timestamp validation — exactly the kind of flaw this exercise is designed to catch before shipping.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Abuse cases are the security team's job, not product/engineering's." — Writing them alongside functional requirements works best as a shared, integrated practice.</li><li>"Secure defaults make a product harder to use." — Well-chosen secure defaults are usually invisible to legitimate users and only add friction for abuse attempts.</li><li>"If a pentest finds nothing, the abuse-case exercise wasn't necessary." — A clean pentest often reflects abuse cases having already been addressed at the design stage, not that the exercise added no value.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Abuse-case writing</li><li>Secure defaults for consumer IoT</li><li>Design reviews with a hardware bill of materials</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Abuse case</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A structured description of how an actor could misuse a system feature to violate a security property, paired with a functional requirement.</dd><dt><b>Secure default</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A configuration a product ships with by default that favors security, requiring deliberate action to weaken rather than to enable.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is the main benefit of writing abuse cases alongside functional requirements, rather than during a later security review?</p><button class="quiz-opt" data-correct="false">It makes the requirements document longer</button><button class="quiz-opt" data-correct="true">Design flaws are surfaced and fixed while they're still cheap to change, before implementation</button><button class="quiz-opt" data-correct="false">It removes the need for any later testing</button><button class="quiz-opt" data-correct="false">It's required by every regulation</button>
+        <div class="quiz-explain">Fixing a design-level security flaw during requirements is far cheaper than fixing it after implementation or, worse, after release.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>OWASP guidance on abuse case / misuse case modeling</li><li>"Software Security Engineering" (Allen, Barnum, Ellison, McGraw, Mead) — requirements chapters</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-04/secure-embedded-software-engineering.html">
+          <span class="dir">← Previous</span>Secure Embedded Software Engineering From First Principles</a><a class="next" href="../../weeks/week-04/input-validation-untrusted-sensor-network-data.html">
+          <span class="dir">Next →</span>Input Validation & Parsing Untrusted Sensor/Network Data</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

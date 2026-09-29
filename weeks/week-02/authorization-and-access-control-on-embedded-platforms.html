@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Authorization & Access Control on Embedded Platforms · IoT &amp; CPS Security</title>
+<meta name="description" content="Apply least privilege to firmware processes and services.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-02/authorization-and-access-control-on-embedded-platforms" data-title="Authorization & Access Control on Embedded Platforms" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-02/index.html">Week 02</a> / Authorization & Access Control on Embedded Platforms</nav>
+<article class="article">
+  <span class="kicker">Week 02 · Lesson 4 · Core</span>
+  <h1>Authorization & Access Control on Embedded Platforms</h1>
+  <p class="lede">Apply least privilege to firmware processes and services.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Authentication answers "who are you?" Authorization answers the more consequential
+  question: "what are you allowed to do now that I know?" On embedded platforms, getting this second question
+  wrong is how a compromised sensor process ends up able to issue actuator commands it should never touch.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Apply least privilege to firmware processes and services.</li><li>Design capability-scoped access for device-to-cloud commands.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–1 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Two access-control models show up repeatedly:</p>
+  <ul>
+    <li><b>RBAC (Role-Based Access Control)</b> — permissions attached to roles (e.g., "sensor," "gateway
+    admin"), assigned to entities. Simple to reason about, coarser-grained.</li>
+    <li><b>ABAC (Attribute-Based Access Control)</b> — permissions computed from attributes (device type,
+    location, time of day). More flexible, harder to audit.</li>
+  </ul>
+  <p><b>Capability-based security</b> takes a different approach entirely: instead of asking "is this identity
+  allowed to do X," a capability is an unforgeable token that directly grants the ability to do X — possession
+  of the capability itself is the authorization. This maps naturally onto command-scoping: a device might issue
+  a narrowly-scoped, time-limited capability for "unlock this specific door once" rather than a broad
+  "authenticated user can send any command" model.</p>
+  <p>Command scoping matters because embedded command interfaces are frequently more permissive than they need
+  to be — a debug or maintenance command left reachable from the same channel as normal operation is a
+  classic elevation-of-privilege path.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  subgraph RBAC
+  U1[User: role=admin] -->|any admin action| SYS1[System]
+  end
+  subgraph Capability
+  U2[User] -->|holds capability: unlock-door-7-once| TOKEN[Scoped capability token]
+  TOKEN -->|only that action| SYS2[System]
+  end</pre><div class="diagram-caption">Capabilities narrow 'what can be done' down to exactly what was granted, nothing more.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>RBAC/ABAC on embedded systems</li><li>Capability-based security</li><li>Command scoping and command-injection risk</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a least-privilege exercise: for any command interface, count how many
+  distinct commands a given identity or role can reach, versus how many it actually needs for its function. A
+  large gap between those numbers is your elevation-of-privilege attack surface.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a gateway's maintenance API accepts both "read sensor status" (needed by
+  the mobile app) and "flash new firmware" (needed only by the manufacturer's update service) on the same
+  authenticated channel. A compromised mobile-app credential can now push firmware — a scope failure that
+  proper command separation would have prevented.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">COMMAND SCOPE AUDIT
+Endpoint/command         | Who actually needs it        | Who can currently reach it
+------------------------------------------------------------------------------------
+GET /status               | Mobile app, gateway            | Mobile app, gateway  (OK)
+POST /flash-firmware       | Manufacturer update service    | Mobile app, gateway, update service (TOO BROAD)
+POST /factory-reset         | Local physical button only     | Any authenticated network client (TOO BROAD)</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>The most impactful authorization fix in many real assessments isn't adding new
+  access controls — it's simply narrowing an overly broad existing one, like separating a "read" scope from a
+  "flash firmware" scope that never should have shared a credential in the first place.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Cloud IoT platforms increasingly expose fine-grained, per-command IAM policies
+  specifically to make this kind of scoping the default rather than something a product team has to build from
+  scratch.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Capability-based security has decades of operating-systems research behind it
+  (Capsicum, seL4) and is seeing renewed interest for IoT specifically because its "possession is authorization"
+  model maps well onto short-lived, narrowly-scoped device interactions.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A widely reported smart-lock vulnerability stemmed from a maintenance command reachable over
+  the same Bluetooth channel as normal unlock commands, with no additional scope check — allowing a nearby
+  attacker to reach functionality that should have required physical access to a separate service port.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Authentication is enough; if you're logged in, you should be able to do what the app lets you do." — Authorization must independently limit actions, not just rely on the app's UI hiding options.</li><li>"RBAC and ABAC are mutually exclusive." — Many real systems layer coarse RBAC roles with finer ABAC conditions.</li><li>"Capability-based security is just RBAC with a different name." — Capabilities grant specific actions directly via unforgeable tokens, rather than checking identity against a role table each time.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>RBAC/ABAC on embedded systems</li><li>Capability-based security</li><li>Command scoping and command-injection risk</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>RBAC</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Role-Based Access Control — permissions attached to roles, assigned to entities.</dd><dt><b>ABAC</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Attribute-Based Access Control — permissions computed dynamically from attributes like device type or context.</dd><dt><b>Capability (security)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An unforgeable token or reference that directly grants the ability to perform a specific action.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is the core idea behind capability-based security?</p><button class="quiz-opt" data-correct="false">Assigning users to broad roles like 'admin' or 'user'</button><button class="quiz-opt" data-correct="true">Possession of an unforgeable token directly grants a specific, scoped action</button><button class="quiz-opt" data-correct="false">Encrypting all authorization decisions</button><button class="quiz-opt" data-correct="false">Using biometrics for every action</button>
+        <div class="quiz-explain">In capability-based security, holding the capability token itself is the authorization — it grants a specific action rather than relying on an identity/role lookup.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-162: Guide to Attribute-Based Access Control</li><li>Capsicum and seL4 capability-security research papers</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-02/authentication-for-constrained-devices.html">
+          <span class="dir">← Previous</span>Authentication for Constrained Devices</a><a class="next" href="../../weeks/week-02/privilege-services-logs-and-hardening-embedded.html">
+          <span class="dir">Next →</span>Privilege, Services, Logs & Hardening on Embedded Linux/RTOS</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

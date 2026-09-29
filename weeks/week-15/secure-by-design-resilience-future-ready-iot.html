@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secure-by-Design, Cyber Resilience & Future-Ready IoT Programs · IoT &amp; CPS Security</title>
+<meta name="description" content="Apply secure-by-design principles from product inception, not retrofit.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-15/secure-by-design-resilience-future-ready-iot" data-title="Secure-by-Design, Cyber Resilience & Future-Ready IoT Programs" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-15/index.html">Week 15</a> / Secure-by-Design, Cyber Resilience & Future-Ready IoT Programs</nav>
+<article class="article">
+  <span class="kicker">Week 15 · Lesson 5 · Advanced</span>
+  <h1>Secure-by-Design, Cyber Resilience & Future-Ready IoT Programs</h1>
+  <p class="lede">Apply secure-by-design principles from product inception, not retrofit.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 15, and the course's core technical material, closes on a synthesis: secure-by-design
+  isn't a single control but a stance — building security in from the very first product decision rather than
+  retrofitting it, and planning resilience for a threat landscape that will keep changing over a device's long
+  field life.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Apply secure-by-design principles from product inception, not retrofit.</li><li>Design a resilience roadmap that anticipates the next decade of IoT threats.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–14 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Secure-by-design principles</b> (aligned with CISA's published guidance) ask manufacturers to
+  take ownership of security outcomes rather than shifting the burden to end users — concretely, this means
+  defaults matching Week 2's hardening baseline out of the box, not as an optional setting users must discover
+  and enable themselves.</p>
+  <p><b>Resilience over pure prevention</b> acknowledges what this entire course has implicitly built toward:
+  given enough time, some prevention control will eventually fail — Week 12's incident response, Week 11's
+  detection, and Week 9's ransomware-readiness material collectively represent the resilience half of a security
+  program that pure prevention (however excellent) can never fully replace.</p>
+  <p><b>Roadmapping for a 10-year product life</b> means explicitly planning, at product inception, for the
+  crypto-agility (Week 3, Week 15's PQC lesson), OTA capability (Week 4), and support-tail commitment (Week 4)
+  that a decade-plus field life will actually require — treating these as day-one architecture decisions, not
+  future problems to solve if and when they arise.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  SBD[Secure-by-design] --> DEFAULTS[Secure defaults\n-- Week 2]
+  SBD --> AGILE[Crypto agility\n-- Week 3, Week 15 PQC]
+  SBD --> OTA[OTA + support tail\n-- Week 4]
+  SBD --> RESIL[Resilience: detection + IR\n-- Weeks 9, 11, 12]
+  SBD --> GOV[Governance + risk\n-- Week 14]</pre><div class="diagram-caption">Every branch of this diagram is a lesson from earlier in the course — this is the whole program, unified.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Secure-by-design principles (CISA-aligned)</li><li>Resilience over pure prevention</li><li>Roadmapping for a 10-year product life</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a 10-year roadmap exercise: for a hypothetical new product, sketch what
+  crypto algorithm, OTA capability, and support commitment decisions would need to be made at launch to remain
+  defensible a decade later — a synthesis exercise pulling together nearly every prior week's material into one
+  forward-looking plan.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a product team launching a new industrial sensor line commits, at
+  inception, to crypto-agile key exchange (supporting future algorithm swaps), a proven OTA pipeline (Week 4),
+  and a published 10-year security-support commitment — treating these as core product requirements alongside
+  functional specifications, not as security "nice-to-haves" considered only after the functional design is
+  locked in.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">SECURE-BY-DESIGN + RESILIENCE PRODUCT CHECKLIST (at inception)
+[ ] Secure defaults match Week 2's hardening baseline, not opt-in
+[ ] Crypto agility built in from day one (Week 3)
+[ ] OTA pipeline proven and secure before launch (Week 4)
+[ ] Published support-tail commitment matching realistic field life
+[ ] Detection and IR readiness planned proportionate to product's
+    risk tier (Week 14's risk-tiered assurance)
+[ ] Governance accountability (Week 14's RACI) assigned for
+    ongoing security decisions across the product's full lifespan</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Secure-by-design's core insight, threaded through this entire course, is that
+  security retrofitted after launch is always more expensive and less complete than security designed in from
+  the start — nearly every anti-pattern this course has examined (default credentials, weak identity, missing
+  crypto agility) traces back to a decision that could have been made correctly at negligible extra cost during
+  initial design, but became expensive or impossible to fix later.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>CISA's secure-by-design initiative has driven growing industry commitment to
+  published security-by-design pledges, reflecting a broader shift toward manufacturer accountability for
+  security outcomes rather than placing that burden on end users who often lack the expertise to secure a device
+  themselves.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Longitudinal research on IoT product security consistently finds that the gap
+  between secure-by-design products and retrofitted ones widens over a device's field life, as the retrofitted
+  products accumulate technical debt that becomes progressively harder to address as the product ages.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Product lines built with explicit 10-year security roadmaps from inception have demonstrated
+  smoother mid-life crypto-agility transitions and regulatory compliance updates compared to product lines that
+  treated these as unplanned, reactive challenges when they eventually arose.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Secure-by-design just means having good security features somewhere in the product." — It specifically means building security in from inception as a default, manufacturer-owned outcome, not an optional or retrofitted add-on.</li><li>"Resilience planning is an admission that prevention has failed." — It's a recognition that no prevention program is perfect indefinitely, making resilience a necessary complement, not a concession of failure.</li><li>"A 10-year product roadmap is only relevant for very expensive, long-lived industrial equipment." — Many consumer and mid-market products also have longer real-world field lives than their initial design assumptions anticipate.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Secure-by-design principles (CISA-aligned)</li><li>Resilience over pure prevention</li><li>Roadmapping for a 10-year product life</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Secure-by-design</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A product development philosophy where manufacturers build security in as a default, owned outcome from the earliest design stages.</dd><dt><b>Resilience (security)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A system's capacity to detect, respond to, and recover from security incidents, complementing but not replacing prevention.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why does secure-by-design generally produce better long-term security outcomes than retrofitting security after launch?</p><button class="quiz-opt" data-correct="false">Retrofitted security is always technically impossible</button><button class="quiz-opt" data-correct="true">Design decisions made at inception (secure defaults, crypto agility, OTA capability) are typically far cheaper and more complete than trying to add them after a product has already shipped and accumulated technical debt</button><button class="quiz-opt" data-correct="false">Secure-by-design products never need any future security updates</button><button class="quiz-opt" data-correct="false">There is no real difference between the two approaches</button>
+        <div class="quiz-explain">This course's cumulative material shows nearly every major anti-pattern traces back to a decision that would have been cheap to make correctly at design time but became expensive or difficult to fix after launch, which is the core argument for secure-by-design.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>CISA Secure by Design principles and pledge</li><li>NIST guidance on IoT product lifecycle security planning</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-15/edge-ml-security-model-governance.html">
+          <span class="dir">← Previous</span>AI at the Edge: Edge-ML Security & Model Governance</a><a class="next" href="../../weeks/week-16/capstone-scenario-charter-success-criteria.html">
+          <span class="dir">Next →</span>Capstone Scenario Charter & Success Criteria</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

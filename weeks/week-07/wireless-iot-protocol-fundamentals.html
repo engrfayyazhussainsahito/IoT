@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireless/IoT Protocol Fundamentals (BLE, Zigbee/Thread, LoRaWAN, Z-Wave, NFC/RFID) · IoT &amp; CPS Security</title>
+<meta name="description" content="Compare range, power, and security models across common IoT radios.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-07/wireless-iot-protocol-fundamentals" data-title="Wireless/IoT Protocol Fundamentals (BLE, Zigbee/Thread, LoRaWAN, Z-Wave, NFC/RFID)" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-07/index.html">Week 07</a> / Wireless/IoT Protocol Fundamentals (BLE, Zigbee/Thread, LoRaWAN, Z-Wave, NFC/RFID)</nav>
+<article class="article">
+  <span class="kicker">Week 07 · Lesson 1 · Core</span>
+  <h1>Wireless/IoT Protocol Fundamentals (BLE, Zigbee/Thread, LoRaWAN, Z-Wave, NFC/RFID)</h1>
+  <p class="lede">Compare range, power, and security models across common IoT radios.</p>
+  <div class="meta-row">
+    <span><b>40 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 0 introduced networking topology in the abstract. Now we get concrete: the
+  specific radio protocols that carry most real IoT traffic, and — crucially — what security guarantees each one
+  actually provides versus what a product team might assume it provides.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Compare range, power, and security models across common IoT radios.</li><li>Match a protocol's built-in security guarantees to a deployment scenario.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–6 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>A quick tour, focused on security posture rather than radio physics:</p>
+  <ul>
+    <li><b>Bluetooth Low Energy (BLE)</b> — pairing establishes a shared key; GATT (Generic Attribute Profile)
+    defines how services and characteristics are exposed. Security depends heavily on pairing method used
+    ("Just Works" pairing offers essentially no protection against an active attacker; passkey or numeric
+    comparison methods are much stronger).</li>
+    <li><b>Zigbee / Thread</b> — mesh protocols using a network-wide key for link-layer encryption. Historically,
+    many Zigbee deployments have used a well-known, standardized default "Trust Center link key" during
+    commissioning, creating a brief but real interception window.</li>
+    <li><b>LoRaWAN</b> — uses a join procedure (OTAA — Over-The-Air Activation, or the weaker ABP — Activation
+    By Personalization) to derive session keys; OTAA is strongly preferred since ABP uses static, unrotated keys.</li>
+    <li><b>NFC/RFID</b> — very short range by design, but vulnerable to <b>relay attacks</b>, where an attacker
+    uses two colluding devices to extend the effective range, tricking a system into thinking a legitimate
+    credential is nearby when it's actually being relayed from far away.</li>
+  </ul>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  BLE[BLE] -->|depends heavily on pairing method| VAR1[Variable: weak to strong]
+  ZB[Zigbee/Thread] -->|network-wide key, commissioning window risk| VAR2[Moderate, weak at commissioning]
+  LORA[LoRaWAN] -->|OTAA strong, ABP weak| VAR3[Variable by activation method]
+  NFC[NFC/RFID] -->|short range but relay-able| VAR4[Vulnerable to relay attacks]</pre><div class="diagram-caption">'The protocol supports encryption' and 'this specific deployment is well-configured' are very different claims.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>BLE pairing and GATT security</li><li>Zigbee/Thread network keys</li><li>LoRaWAN join procedures</li><li>NFC/RFID relay risk</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a configuration-audit habit: for any protocol on this list, the
+  security-relevant question is never just "does it support strong security" but "which specific mode/method is
+  this deployment actually using." BLE, Zigbee, and LoRaWAN all support both strong and weak configurations
+  simultaneously.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a smart-lock uses BLE "Just Works" pairing for ease of setup, since it
+  requires no display or keypad on the lock itself. An attacker within radio range during the pairing window can
+  perform a man-in-the-middle attack, since Just Works provides no authentication of the pairing process itself
+  — a real, documented weakness class rather than a theoretical one.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">PROTOCOL SECURITY CONFIGURATION AUDIT
+Protocol: ________________
+Specific mode/method in use: ________________
+  (e.g., BLE: Just Works vs. Passkey vs. Numeric Comparison
+   LoRaWAN: OTAA vs. ABP
+   Zigbee: default Trust Center link key vs. installation-code-derived key)
+Known weaknesses of this specific mode: ________________
+Mitigations applied (if any): ________________</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Reading "this protocol supports AES-128 encryption" in a datasheet tells you almost
+  nothing about a specific deployment's actual security — the devil is entirely in which optional mode was
+  chosen, and vendors frequently choose the easier, weaker option to simplify user setup experience.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Protocol certification bodies (Bluetooth SIG, Zigbee Alliance/CSA, LoRa Alliance)
+  have progressively strengthened default security recommendations in newer protocol revisions, but backward
+  compatibility requirements mean weaker legacy modes often remain supported and selectable for years.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Academic and industry security research continues to find real-world deployments
+  using the weakest available configuration option (Just Works pairing, ABP activation, default Zigbee keys) at
+  surprisingly high rates, underscoring that this is a persistent deployment problem, not a solved one.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Documented relay-attack research against NFC-based and RF-based vehicle entry systems has
+  demonstrated real-world exploitation of the short-range assumption these protocols rely on, using inexpensive,
+  commercially available relay hardware.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"If a protocol supports AES encryption, a device using it is secure." — Support for strong encryption doesn't guarantee the deployment actually uses the strongest available mode.</li><li>"NFC/RFID's short range makes relay attacks impractical." — Relay attacks specifically defeat the short-range assumption using two colluding devices, and have been demonstrated repeatedly in practice.</li><li>"All Zigbee/Thread mesh networks are equally secure." — Security depends heavily on how network keys are provisioned during commissioning, not just the protocol's theoretical capabilities.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>BLE pairing and GATT security</li><li>Zigbee/Thread network keys</li><li>LoRaWAN join procedures</li><li>NFC/RFID relay risk</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>GATT</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Generic Attribute Profile — the BLE specification defining how services and data are exposed and accessed.</dd><dt><b>OTAA / ABP</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>LoRaWAN activation methods — Over-The-Air Activation (dynamic session keys) versus Activation By Personalization (static, unrotated keys).</dd><dt><b>Relay attack</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An attack using two colluding devices to extend the effective range of a short-range signal, defeating proximity-based security assumptions.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is BLE 'Just Works' pairing considered weak against an active attacker?</p><button class="quiz-opt" data-correct="false">It doesn't use any encryption at all</button><button class="quiz-opt" data-correct="true">It provides no authentication of the pairing process itself, making it susceptible to man-in-the-middle attacks during pairing</button><button class="quiz-opt" data-correct="false">It's incompatible with most BLE devices</button><button class="quiz-opt" data-correct="false">It requires a display and keypad, which most devices don't have</button>
+        <div class="quiz-explain">Just Works pairing establishes an encrypted link but doesn't authenticate the pairing exchange itself, leaving it open to interception by an active attacker present during pairing.</div></div>
+<div class="quiz-q"><p class="prompt">2. What makes NFC/RFID systems vulnerable to relay attacks despite their short intended range?</p><button class="quiz-opt" data-correct="false">NFC has no encryption</button><button class="quiz-opt" data-correct="true">Two colluding attacker devices can relay signals over distance, tricking a system into thinking a legitimate credential is physically nearby</button><button class="quiz-opt" data-correct="false">NFC signals travel further than advertised</button><button class="quiz-opt" data-correct="false">Relay attacks are only theoretical and have never been demonstrated</button>
+        <div class="quiz-explain">Relay attacks use two devices to extend the effective range of a short-range signal, defeating the proximity assumption the system relies on for security.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>Bluetooth SIG security specifications and pairing method comparison</li><li>LoRa Alliance LoRaWAN security whitepaper</li><li>Zigbee Alliance (Connectivity Standards Alliance) security documentation</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-06/trusted-execution-secure-elements-hsm-iot.html">
+          <span class="dir">← Previous</span>Trusted Execution, Secure Elements, TPM & HSM for IoT</a><a class="next" href="../../weeks/week-07/rf-sdr-traffic-analysis-detection.html">
+          <span class="dir">Next →</span>RF & SDR-Based Traffic Analysis and Detection</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

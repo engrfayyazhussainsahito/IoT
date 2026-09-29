@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Key Management & Crypto Agility Across Device Fleets · IoT &amp; CPS Security</title>
+<meta name="description" content="Design a key-rotation plan for a fleet with no user interface.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-03/key-management-and-crypto-agility-fleets" data-title="Key Management & Crypto Agility Across Device Fleets" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-03/index.html">Week 03</a> / Key Management & Crypto Agility Across Device Fleets</nav>
+<article class="article">
+  <span class="kicker">Week 03 · Lesson 5 · Core</span>
+  <h1>Key Management & Crypto Agility Across Device Fleets</h1>
+  <p class="lede">Design a key-rotation plan for a fleet with no user interface.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">A device with a ten-year expected lifespan will very likely outlive the cryptographic
+  algorithms it shipped with. Planning for that eventuality — rather than discovering it in a panic when a
+  primitive is broken — is what key management and crypto agility are about.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Design a key-rotation plan for a fleet with no user interface.</li><li>Explain crypto agility and why it matters for 10+ year device lifespans.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–2 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Fleet-wide key provisioning</b> needs a plan for the entire lifecycle: initial injection at
+  manufacturing, periodic rotation, and revocation of compromised or decommissioned devices — all without
+  physical access to most of the fleet after it ships.</p>
+  <p><b>Rotation without bricking devices</b> is a genuinely hard operational problem: a naive rotation scheme
+  that pushes a new key and immediately invalidates the old one can permanently strand any device that misses
+  the update window (due to being offline, low battery, or a failed update). Safer designs use overlapping
+  validity periods or staged rollouts.</p>
+  <p><b>Crypto agility</b> means designing a system so that swapping a cryptographic primitive (in response to a
+  newly discovered weakness, or the eventual arrival of practical quantum computers — see Week 15) doesn't
+  require a full hardware redesign. This typically means avoiding hardcoded algorithm identifiers deep in
+  protocol logic and instead negotiating algorithms explicitly, the way TLS cipher suites work.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">gantt
+  title Overlapping key validity (safe rotation)
+  dateFormat X
+  axisFormat %s
+  section Old key
+  Valid           :a1, 0, 10
+  section New key
+  Valid           :a2, 6, 16
+  section Risk window
+  Both keys accepted (safe overlap) :crit, 6, 10</pre><div class="diagram-caption">Devices that miss the rotation window during the overlap period still authenticate successfully.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Fleet-wide key provisioning</li><li>Rotation without bricking devices</li><li>Planning for algorithm deprecation</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a fleet-rotation risk estimate: if 2% of a 100,000-device fleet is
+  offline at any given time (dead battery, network outage), a hard cutover rotation with no overlap window would
+  instantly and permanently strand roughly 2,000 devices unless a recovery mechanism exists.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: rotating a fleet's authentication key with a 30-day overlap window, during
+  which both the old and new keys are accepted. Devices that check in at least once during that window pick up
+  the new key; devices that don't are flagged for manual/field intervention rather than being silently and
+  permanently locked out.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">FLEET KEY ROTATION PLAN TEMPLATE
+Current key ID: ________   New key ID: ________
+Overlap window (both keys valid): ________ days
+Rollout stages: canary (___%) -> broader (___%) -> full fleet
+Fallback for devices that miss the window: ________________
+Monitoring: % of fleet on new key, updated daily, alert if
+            stalled below ____% after the overlap window closes</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>An overlap window is a deliberate, temporary security trade-off (both old and new
+  keys are valid, which is technically weaker than a hard cutover) made in exchange for avoiding a worse outcome
+  — permanently orphaned devices that can never be secured or updated again.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Cloud IoT device-management platforms increasingly support staged/canary rollouts
+  for exactly this reason — rotating credentials for a small percentage of a fleet first, monitoring for
+  problems, before proceeding to the full fleet.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Crypto agility is a major theme in current post-quantum migration planning
+  research (previewed here, developed fully in Week 15): the ability to swap primitives without hardware
+  redesign is the difference between a manageable transition and a fleet-wide replacement cycle.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Multiple industry incidents involve certificate or key expiration events that, due to lack of
+  an overlap or renewal mechanism, caused widespread device outages — a availability failure caused directly by
+  absent rotation planning rather than any cryptographic weakness.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Key rotation should always be an immediate, hard cutover for maximum security." — A hard cutover with no overlap can permanently strand offline devices; overlap windows are a deliberate, usually correct trade-off.</li><li>"Crypto agility only matters once quantum computers are practical." — Any newly discovered weakness in a current algorithm creates the same urgent need for agility.</li><li>"If a device is offline during rotation, it's not the rotation plan's problem." — A well-designed fleet plan should explicitly account for offline devices, not treat them as edge cases to ignore.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Fleet-wide key provisioning</li><li>Rotation without bricking devices</li><li>Planning for algorithm deprecation</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Crypto agility</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The ability to swap cryptographic algorithms or key sizes without requiring a full hardware or architecture redesign.</dd><dt><b>Canary rollout</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A staged deployment strategy that applies a change to a small subset of a fleet before wider release.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why do fleet key-rotation plans often use an overlap window where both old and new keys are valid?</p><button class="quiz-opt" data-correct="false">It's cryptographically stronger than a hard cutover</button><button class="quiz-opt" data-correct="true">It prevents permanently stranding devices that are offline or miss the rotation, at an acceptable temporary security trade-off</button><button class="quiz-opt" data-correct="false">It's required by all cryptographic standards</button><button class="quiz-opt" data-correct="false">It has no real purpose</button>
+        <div class="quiz-explain">An overlap window trades a temporary, small security weakening (two valid keys) for avoiding permanently orphaned devices that missed the cutover.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-57: Recommendation for Key Management</li><li>NIST guidance on migration to post-quantum cryptography (crypto agility framing)</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-03/randomness-and-entropy-on-embedded-hardware.html">
+          <span class="dir">← Previous</span>Randomness & Entropy on Embedded Hardware</a><a class="next" href="../../weeks/week-04/secure-embedded-software-engineering.html">
+          <span class="dir">Next →</span>Secure Embedded Software Engineering From First Principles</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

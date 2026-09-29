@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stack/Heap/Process Memory on Bare-Metal & RTOS Targets · IoT &amp; CPS Security</title>
+<meta name="description" content="Trace stack and heap usage across RTOS task switches.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-05/stack-heap-process-memory-bare-metal" data-title="Stack/Heap/Process Memory on Bare-Metal & RTOS Targets" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-05/index.html">Week 05</a> / Stack/Heap/Process Memory on Bare-Metal & RTOS Targets</nav>
+<article class="article">
+  <span class="kicker">Week 05 · Lesson 2 · Advanced</span>
+  <h1>Stack/Heap/Process Memory on Bare-Metal & RTOS Targets</h1>
+  <p class="lede">Trace stack and heap usage across RTOS task switches.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">On a desktop OS, the stack and heap are managed by an operating system that gives
+  each process its own virtual address space. On an RTOS, every task typically shares one physical address space
+  with fixed-size stacks allocated at compile time — a very different, and much less forgiving, environment.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Trace stack and heap usage across RTOS task switches.</li><li>Explain stack-overflow risk in a fixed-size-task-stack world.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–4 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Each RTOS task gets its own <b>stack</b>, but its size is usually fixed at task-creation time and
+  allocated from a shared pool of RAM. If a task's actual stack usage (determined by its deepest call chain plus
+  any local buffers) exceeds this fixed allocation, it silently overflows into adjacent memory — which might
+  belong to another task, or to the heap, with no OS-level page-fault mechanism to catch it the way a desktop OS
+  would.</p>
+  <p><b>Static vs. dynamic allocation</b>: many embedded style guides (and MISRA C) discourage dynamic
+  allocation (heap/malloc) entirely in favor of static, compile-time-sized buffers — heap fragmentation on a
+  long-running, memory-constrained device can eventually cause allocation failures that are extremely hard to
+  reproduce and debug.</p>
+  <p><b>Stack canaries</b> — a known sentinel value placed just past a buffer, checked before a function returns
+  — are a useful mitigation but are not universally available or enabled on every embedded toolchain and
+  architecture; verify they're actually active rather than assuming so by default.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  POOL[Shared RAM pool] --> S1[Task A stack\nfixed size]
+  POOL --> S2[Task B stack\nfixed size]
+  POOL --> S3[Task C stack\nfixed size]
+  S1 -.overflow.-> S2
+  style S1 fill:#f7e6df,stroke:#9c4221</pre><div class="diagram-caption">An overflowing task's stack can corrupt an adjacent task's memory with no OS-level barrier.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Per-task stacks in an RTOS</li><li>Static vs. dynamic allocation on firmware</li><li>Stack canaries on constrained targets</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a stack-sizing exercise: measure (via static analysis tools or a
+  stack-painting technique, filling stack memory with a known pattern and checking high-water-mark usage after
+  running) the deepest actual stack usage for each task, and compare against its allocated size with a safety
+  margin — not just a guessed round number.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a task allocates a 512-byte stack based on a rough guess. A rarely
+  triggered error-handling code path calls three additional nested functions, each with modest local buffers,
+  pushing actual usage to 600 bytes under that specific condition — an overflow that only manifests when that
+  particular error path executes, making it very difficult to catch with typical testing.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">STACK SIZING CHECKLIST
+[ ] Measured (not guessed) worst-case stack depth per task, including
+    rare error-handling code paths
+[ ] Safety margin added (commonly 20-25% above measured worst case)
+[ ] Stack canaries/guard pages enabled if the toolchain supports them
+[ ] Stack usage re-measured after any significant code change
+    (a new nested function call can silently increase worst-case depth)</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>A stack overflow that corrupts an adjacent task's memory is a serious, often
+  remotely-triggerable vulnerability class — especially if the overflow can be induced by attacker-controlled
+  input reaching a deep call chain or a rarely-tested error path.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Static stack-usage analysis tools that compute worst-case stack depth at compile
+  time (rather than relying on runtime measurement alone) are increasingly integrated into embedded CI pipelines
+  specifically to catch this class of latent bug before it ships.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Formal worst-case stack analysis remains an active research area, particularly for
+  codebases with function pointers or recursive calls, where static analysis tools can struggle to compute a
+  tight, provably correct bound.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A documented pattern in embedded post-mortems: a firmware update adds a new logging call deep
+  within an existing function, incrementally increasing stack usage just enough to push a previously
+  safely-sized task's stack into overflow territory — a regression introduced by an unrelated, seemingly minor
+  change.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"A stack overflow will always cause an obvious crash." — Without protection mechanisms, it can silently corrupt adjacent memory instead of crashing immediately.</li><li>"If the code worked in testing, stack sizing is fine." — Rare error-handling paths can have much deeper call chains than commonly tested paths.</li><li>"Dynamic allocation (malloc) is always fine on embedded systems if you have enough RAM." — Long-running fragmentation risk exists independent of total RAM size.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Per-task stacks in an RTOS</li><li>Static vs. dynamic allocation on firmware</li><li>Stack canaries on constrained targets</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Stack canary</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A known sentinel value placed near a buffer, checked before function return to detect stack-based buffer overflows.</dd><dt><b>High-water-mark stack usage</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The maximum stack depth actually reached by a task during execution, often measured via stack-painting techniques.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is a stack overflow particularly dangerous on many embedded/RTOS systems compared to a desktop OS?</p><button class="quiz-opt" data-correct="false">Embedded systems don't have stacks at all</button><button class="quiz-opt" data-correct="true">Without OS-level memory protection, an overflowing task's stack can silently corrupt an adjacent task's memory with no page-fault to catch it</button><button class="quiz-opt" data-correct="false">Embedded stacks are always larger, so overflow can't happen</button><button class="quiz-opt" data-correct="false">It's actually less dangerous on embedded systems</button>
+        <div class="quiz-explain">Many embedded/RTOS environments lack the memory protection a desktop OS provides, so a stack overflow can silently corrupt adjacent memory rather than triggering an immediate, catchable fault.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>FreeRTOS documentation on stack usage measurement (uxTaskGetStackHighWaterMark)</li><li>MISRA C guidance on dynamic memory allocation</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-05/memory-c-unsafe-code-microcontrollers.html">
+          <span class="dir">← Previous</span>Memory, C & Unsafe Code From First Principles on Microcontrollers</a><a class="next" href="../../weeks/week-05/buffer-overflows-memory-corruption-firmware.html">
+          <span class="dir">Next →</span>Buffer Overflows & Memory Corruption in Firmware</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

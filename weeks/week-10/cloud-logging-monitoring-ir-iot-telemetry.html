@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Logging, Monitoring & IR for IoT Telemetry Pipelines · IoT &amp; CPS Security</title>
+<meta name="description" content="Design logging that scales to millions of low-context device events.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-10/cloud-logging-monitoring-ir-iot-telemetry" data-title="Cloud Logging, Monitoring & IR for IoT Telemetry Pipelines" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-10/index.html">Week 10</a> / Cloud Logging, Monitoring & IR for IoT Telemetry Pipelines</nav>
+<article class="article">
+  <span class="kicker">Week 10 · Lesson 5 · Core</span>
+  <h1>Cloud Logging, Monitoring & IR for IoT Telemetry Pipelines</h1>
+  <p class="lede">Design logging that scales to millions of low-context device events.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 9 designed minimal, high-value telemetry from the device's perspective. This
+  lesson picks up where that telemetry lands: the cloud logging and monitoring pipeline that has to make sense of
+  potentially millions of low-context events per hour without drowning the humans watching it in noise.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Design logging that scales to millions of low-context device events.</li><li>Adapt cloud incident response to fleet-wide device compromise scenarios.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–9 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>High-volume telemetry log design</b>: a fleet of a million devices, each sending even a small
+  amount of telemetry regularly, produces log volume that dwarfs typical enterprise IT logging — requiring
+  purpose-built ingestion and storage strategies (aggregation, sampling, tiered retention) rather than treating
+  IoT telemetry like conventional application logs.</p>
+  <p><b>Alerting without alert fatigue</b>: naive threshold-based alerting on noisy, individually low-context
+  device signals produces overwhelming false-positive volume. Effective IoT alerting typically requires
+  fleet-level baselining (what's normal for this cohort of devices) rather than static per-device thresholds.</p>
+  <p><b>Fleet-wide IR playbook basics</b>: an incident affecting a device fleet requires different triage logic
+  than a single-server incident — the first question often isn't "is this device compromised" but "how many
+  devices are showing this pattern, and is it growing," since scale and growth rate often matter more than any
+  single device's specific symptoms.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  DEV[Millions of devices] --> INGEST[High-volume ingestion\n+ aggregation]
+  INGEST --> BASELINE[Fleet/cohort\nbaseline model]
+  BASELINE --> ALERT{Deviation from\nbaseline?}
+  ALERT -->|Yes, growing| IR[Fleet-wide IR triage]
+  ALERT -->|No| NORMAL[Normal operation]</pre><div class="diagram-caption">Baselining at the cohort level, not per-device thresholds, is what makes fleet-scale alerting tractable.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>High-volume telemetry log design</li><li>Alerting without alert fatigue</li><li>Fleet-wide IR playbook basics</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a false-positive-rate sanity check: even a very low per-device false
+  positive rate (say, 0.01%) becomes an overwhelming absolute number of alerts at fleet scale (100 alerts per day
+  from a million-device fleet) — reinforcing why baseline-relative, cohort-level alerting is necessary rather
+  than naive per-device thresholding.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a specific firmware version's devices begin showing a slightly elevated
+  reboot rate. Individually, each reboot looks unremarkable and wouldn't trigger a per-device alert; but a
+  cohort-level baseline comparing this firmware version's reboot rate against its historical norm (and against
+  other firmware versions in the same fleet) flags the deviation clearly, surfacing what may be an early
+  compromise or defect signal.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">FLEET-WIDE INCIDENT TRIAGE FIRST QUESTIONS
+1. How many devices are showing this pattern right now?
+2. Is that number growing, stable, or shrinking over the last hour/day?
+3. Is it concentrated in a specific cohort (firmware version, region,
+   hardware batch) or spread evenly across the fleet?
+4. Does the pattern correlate with a recent deployment, config change,
+   or external event (e.g., a new CVE disclosure)?
+--> Answering these BEFORE deep-diving into any single device's logs
+    focuses investigation effort where it matters most.</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Fleet-scale incident response inverts typical IT triage instinct: instead of
+  starting with "what happened on this one device," effective IoT IR starts with "what's the shape of this
+  pattern across the fleet," since scale and growth trajectory are often the most diagnostic signals available.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>IoT-specific SIEM and monitoring platforms increasingly build in cohort-based
+  baselining as a core feature, recognizing that traditional per-host alerting logic, imported unmodified from
+  enterprise IT tooling, doesn't scale to fleet volumes without overwhelming false positives.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Anomaly detection research for large-scale IoT telemetry increasingly focuses on
+  unsupervised, cohort-relative baselining techniques specifically because labeled training data for "this
+  specific device is compromised" is rarely available at the scale needed for supervised approaches.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Multiple large-scale IoT fleet operators have publicly described detecting early-stage
+  security incidents through exactly this cohort-deviation pattern — a subtle firmware-version-specific behavior
+  shift that would have been invisible in per-device alerting but was clearly visible in aggregate.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"IoT telemetry can use the same logging and alerting approach as typical enterprise IT systems." — Fleet scale and low per-event context require purpose-built aggregation and baselining approaches.</li><li>"Lower per-device false-positive rates automatically solve alert fatigue at fleet scale." — Even very low individual rates translate to large absolute alert volumes across a large fleet.</li><li>"The first step in fleet incident response should be deep individual-device log analysis." — Understanding the pattern's scale and trajectory across the fleet first focuses effort more effectively.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>High-volume telemetry log design</li><li>Alerting without alert fatigue</li><li>Fleet-wide IR playbook basics</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Cohort baselining</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Establishing expected-normal behavior patterns for a group of similar devices, used to detect meaningful deviations at fleet scale.</dd><dt><b>Alert fatigue</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Desensitization to security alerts caused by excessive false-positive volume, risking missed genuine incidents.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why does fleet-scale IoT alerting typically require cohort-level baselining rather than static per-device thresholds?</p><button class="quiz-opt" data-correct="false">Cohort baselining is always cheaper to implement</button><button class="quiz-opt" data-correct="true">Static per-device thresholds at fleet scale tend to produce overwhelming false-positive volume even at low individual error rates</button><button class="quiz-opt" data-correct="false">Per-device thresholds don't work with any telemetry format</button><button class="quiz-opt" data-correct="false">Cohort baselining eliminates the need for any human review</button>
+        <div class="quiz-explain">Even a very low per-device false-positive rate becomes an overwhelming absolute number of alerts across a large fleet, making baseline-relative, cohort-level alerting necessary for practical fleet-scale monitoring.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>Research on anomaly detection for large-scale IoT telemetry (survey papers)</li><li>SANS guidance on SOC alert-fatigue mitigation strategies</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-10/devsecops-pipelines-iac-iot-platforms.html">
+          <span class="dir">← Previous</span>DevSecOps Pipelines & IaC for IoT Platforms</a><a class="next" href="../../weeks/week-11/secops-first-principles-iot-ot.html">
+          <span class="dir">Next →</span>SecOps From First Principles for IoT/OT Environments</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

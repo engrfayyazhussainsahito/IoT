@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embedded Operating Systems & RTOS From First Principles · IoT &amp; CPS Security</title>
+<meta name="description" content="Explain scheduling, memory protection (or its absence), and IPC on an RTOS.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-02/embedded-operating-systems-from-first-principles" data-title="Embedded Operating Systems & RTOS From First Principles" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-02/index.html">Week 02</a> / Embedded Operating Systems & RTOS From First Principles</nav>
+<article class="article">
+  <span class="kicker">Week 02 · Lesson 1 · Core</span>
+  <h1>Embedded Operating Systems & RTOS From First Principles</h1>
+  <p class="lede">Explain scheduling, memory protection (or its absence), and IPC on an RTOS.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 0 introduced the RTOS task model at a glance. Here we go deeper: how scheduling
+  actually decides what runs next, what memory protection buys you when it exists, and why an interrupt handler
+  is one of the most dangerous places to have a bug on an embedded target.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Explain scheduling, memory protection (or its absence), and IPC on an RTOS.</li><li>Identify attack surface unique to cooperative vs. preemptive schedulers.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–1 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Two scheduling philosophies dominate embedded systems: <b>cooperative</b> scheduling, where a
+  task must voluntarily yield control, and <b>preemptive</b> scheduling, where a timer interrupt can forcibly
+  switch tasks at any point. Preemptive scheduling (used by FreeRTOS, Zephyr) is more responsive but introduces
+  race conditions any two tasks touching shared state must guard against with mutexes or critical sections.</p>
+  <p>Memory protection varies dramatically by chip class: high-end Cortex-A parts running embedded Linux get a
+  full MMU with virtual memory; mid-range Cortex-M parts may have an MPU that can wall off a handful of regions;
+  the cheapest microcontrollers have no protection at all — every task, including a compromised one, can read
+  and write all of memory.</p>
+  <p>Interrupt Service Routines (ISRs) run outside the normal task scheduling model, often with restrictions on
+  what they can safely call. A bug in an ISR — a buffer overflow triggered by, say, malformed sensor data
+  arriving on a hardware interrupt — can corrupt state in ways that are unusually hard to reproduce and debug.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  A[No protection\ncheap MCU, no RTOS isolation] --> B[MPU-based\nCortex-M + RTOS regions]
+  B --> C[Full MMU\nCortex-A + embedded Linux]
+  style A fill:#f7e6df,stroke:#9c4221
+  style C fill:#e3efe6,stroke:#2f6b46</pre><div class="diagram-caption">Know where your target sits on this spectrum before assuming any isolation exists.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Task/thread models</li><li>MPU vs. MMU vs. no protection</li><li>Interrupt-driven attack surface</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula, but a useful heuristic: assume worst-case protection unless proven otherwise. If
+  you cannot find explicit MPU/MMU configuration in the boot code, treat every task as having full read/write
+  access to every other task's memory.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a sensor-fusion task and a network task share a buffer without a mutex.
+  Under cooperative scheduling this might work by luck (tasks only switch at defined yield points). Move the
+  same code to a preemptive scheduler and a timer interrupt can switch mid-write, producing a race condition
+  that only manifests intermittently — a classic embedded heisenbug.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-c">// Unsafe: shared buffer with no protection under a preemptive scheduler
+uint8_t shared_buf[64];
+void sensor_task(void) { memcpy(shared_buf, new_reading, 64); }   // could be preempted mid-copy
+void net_task(void)    { send(shared_buf, 64); }                  // reads a torn buffer
+
+// Safer: guard with a mutex (FreeRTOS style)
+SemaphoreHandle_t buf_mutex;
+void sensor_task(void) {
+  xSemaphoreTake(buf_mutex, portMAX_DELAY);
+  memcpy(shared_buf, new_reading, 64);
+  xSemaphoreGive(buf_mutex);
+}</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Race conditions in embedded code are not just reliability bugs — a torn read of a
+  security-relevant buffer (a partially-updated session key, for instance) can leak or corrupt data in ways an
+  attacker can sometimes trigger deliberately by flooding a device with interrupts.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Vendors of MPU-capable chips increasingly ship reference configurations that wall
+  off a "secure" partition from the rest of firmware — but the security benefit only materializes if the product
+  team actually enables and correctly configures the MPU, which is an extra step many teams skip under schedule
+  pressure.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Formal verification of RTOS scheduling correctness (seL4-style approaches) remains
+  mostly confined to high-assurance systems; most commercial IoT firmware relies on testing and code review
+  rather than formal proof of race-freedom.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A documented pattern in consumer IoT firmware: a Wi-Fi credential buffer shared between the
+  provisioning task and the connection task, with no locking, occasionally produced garbled credentials under
+  network stress — traced eventually to a preemption race rather than a network bug.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"An RTOS automatically prevents race conditions." — An RTOS provides tools (mutexes, queues) to prevent them, but does nothing automatically.</li><li>"If it works in testing, the race condition doesn't exist." — Races are often timing-dependent and can hide during testing while surfacing in the field.</li><li>"ISRs can safely do anything a normal task can." — Many RTOS APIs are unsafe or forbidden to call from interrupt context.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Task/thread models</li><li>MPU vs. MMU vs. no protection</li><li>Interrupt-driven attack surface</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>MPU</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Memory Protection Unit — hardware that can restrict which memory regions a task may access, without full virtual memory.</dd><dt><b>ISR</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Interrupt Service Routine — code that runs in response to a hardware interrupt, outside normal task scheduling.</dd><dt><b>Race condition</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A bug where the outcome depends on the relative timing of concurrent operations.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is the key difference between cooperative and preemptive scheduling?</p><button class="quiz-opt" data-correct="false">Cooperative scheduling is always faster</button><button class="quiz-opt" data-correct="true">In preemptive scheduling, a task can be interrupted at any point by a timer; in cooperative scheduling, a task must voluntarily yield</button><button class="quiz-opt" data-correct="false">Preemptive scheduling has no interrupts</button><button class="quiz-opt" data-correct="false">They are the same thing with different names</button>
+        <div class="quiz-explain">Preemptive scheduling can switch tasks at any time via a timer interrupt, introducing race conditions that cooperative scheduling's voluntary-yield model avoids by design.</div></div>
+<div class="quiz-q"><p class="prompt">2. Why is a shared buffer accessed by two tasks without a mutex risky under a preemptive scheduler?</p><button class="quiz-opt" data-correct="false">It uses more memory</button><button class="quiz-opt" data-correct="true">A task could be preempted mid-write, leaving the buffer in a torn, inconsistent state for the other task to read</button><button class="quiz-opt" data-correct="false">It will fail to compile</button><button class="quiz-opt" data-correct="false">It only matters on chips with an MMU</button>
+        <div class="quiz-explain">Without synchronization, preemption can interleave a write and a read, producing inconsistent ('torn') data — a classic race condition.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>FreeRTOS kernel documentation on synchronization primitives</li><li>ARM Cortex-M MPU programming guide</li><li>seL4 microkernel formal verification overview</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-01/iot-ecosystem-architecture.html">
+          <span class="dir">← Previous</span>IoT Ecosystem Architecture: Device, Gateway, Cloud, and Data Flow</a><a class="next" href="../../weeks/week-02/device-identity-models.html">
+          <span class="dir">Next →</span>Device Identity Models (X.509 device certs, PUFs, hardware IDs)</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

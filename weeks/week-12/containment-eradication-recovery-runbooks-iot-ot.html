@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Containment, Eradication & Recovery Runbooks for IoT/OT · IoT &amp; CPS Security</title>
+<meta name="description" content="Write a containment runbook that avoids unsafe physical-world side effects.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-12/containment-eradication-recovery-runbooks-iot-ot" data-title="Containment, Eradication & Recovery Runbooks for IoT/OT" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-12/index.html">Week 12</a> / Containment, Eradication & Recovery Runbooks for IoT/OT</nav>
+<article class="article">
+  <span class="kicker">Week 12 · Lesson 4 · Core</span>
+  <h1>Containment, Eradication & Recovery Runbooks for IoT/OT</h1>
+  <p class="lede">Write a containment runbook that avoids unsafe physical-world side effects.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">This lesson turns Week 12's principles into the actual documents a responder follows
+  during an incident: runbooks specific enough to execute under pressure, but built around the safety-first and
+  physical-plausibility considerations the rest of this week has established.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Write a containment runbook that avoids unsafe physical-world side effects.</li><li>Plan recovery steps that restore both function and trust in a device.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–11 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Safe containment actions for actuating devices</b>: rather than a single generic "isolate the
+  device" instruction, an effective runbook specifies containment options ranked by disruption level — logical
+  network isolation (least disruptive, may not fully stop an active compromise), controlled shutdown sequence
+  (more disruptive, safer for the physical process), and full physical disconnection (most disruptive, reserved
+  for confirmed severe compromise) — matched to the specific asset's actual operational context.</p>
+  <p><b>Re-provisioning vs. re-flashing</b>: eradication for a compromised IoT device might mean simply
+  re-provisioning it with new credentials (Week 3/10's key-rotation material) if the compromise was
+  credential-based, or a full firmware re-flash (Week 4's OTA material) if the compromise involved actual code
+  execution or persistence — choosing the wrong, lighter-weight option risks leaving the actual root cause
+  unaddressed.</p>
+  <p><b>Verifying eradication on constrained hardware</b> is genuinely harder than on a server: without the rich
+  tooling available on a general-purpose OS, confirming "this device is now clean" often relies on attestation
+  (Week 9) and a known-good firmware hash comparison, rather than a comprehensive malware scan the device simply
+  can't run.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  A[Logical network isolation\nleast disruptive] --> B{Compromise\ncontained?}
+  B -->|No| C[Controlled shutdown sequence\nmore disruptive, safer]
+  C --> D{Compromise\ncontained?}
+  D -->|No| E[Full physical disconnection\nmost disruptive]</pre><div class="diagram-caption">Escalate only as far as necessary — and only with the appropriate sign-off from earlier lessons' command structure.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Safe containment actions for actuating devices</li><li>Re-provisioning vs. re-flashing</li><li>Verifying eradication on constrained hardware</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, an eradication-scope decision rule: if the compromise involved only
+  credential misuse with no evidence of code execution or persistence, re-provisioning may suffice; any evidence
+  of code execution, unexpected firmware behavior, or unexplained persistence should default to a full re-flash,
+  since partial remediation risks leaving a foothold in place.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: an investigation determines a device was compromised purely through a
+  weak, reused password with no evidence of firmware tampering. Re-provisioning with a new, unique credential and
+  confirming via attestation that the firmware hash matches the known-good baseline is a proportionate eradication
+  step — a full re-flash would be unnecessary disruption for a purely credential-based compromise.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">CONTAINMENT/ERADICATION RUNBOOK TEMPLATE (per asset class)
+Asset: ________________________
+Containment ladder for this asset:
+  Step 1 (least disruptive): ________________________
+  Step 2: ________________________
+  Step 3 (most disruptive): ________________________
+Eradication decision rule:
+  Credential-only compromise -> ________________________
+  Evidence of code execution/persistence -> ________________________
+Eradication verification method (attestation, hash comparison, etc.):
+  ________________________</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>A one-size-fits-all "isolate everything, reflash everything" incident response
+  policy is operationally simpler to write but wastes response effort and causes unnecessary disruption compared
+  to a ladder-based, evidence-driven approach — proportionality matters as much in response as it does in the
+  risk-scoring methods from earlier in this course.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Mature IoT/OT security programs maintain asset-class-specific runbooks rather than
+  one generic incident response document, recognizing that a sensor and a safety-critical actuator warrant very
+  different containment ladders even if both technically fall under "IoT device."</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Research into automated, policy-driven containment-action selection (choosing the
+  least-disruptive-sufficient containment step based on real-time evidence) is an active area, aiming to remove
+  some of the time pressure from this decision during a live incident.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Post-incident reviews have repeatedly found that responders defaulted to maximum-disruption
+  containment (full physical disconnection) even in cases where a lighter step would have sufficed, simply
+  because no asset-specific runbook existed to guide a more proportionate response under time pressure.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"The most aggressive containment action is always the safest choice." — Over-aggressive containment can itself cause unnecessary operational disruption or, in some cases, an unsafe abrupt shutdown.</li><li>"Re-provisioning and re-flashing are interchangeable eradication options." — They address different root causes; choosing the lighter option for a code-execution compromise risks leaving a foothold in place.</li><li>"You can always run a full malware scan to verify eradication." — Many constrained devices lack the tooling for this; attestation and known-good hash comparison are the realistic alternative.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Safe containment actions for actuating devices</li><li>Re-provisioning vs. re-flashing</li><li>Verifying eradication on constrained hardware</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Containment ladder</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A ranked set of containment actions from least to most operationally disruptive, matched to the severity of a confirmed compromise.</dd><dt><b>Re-provisioning</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Reissuing a device's credentials or identity material as a remediation step, without necessarily replacing its firmware.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why might re-provisioning (issuing new credentials) be insufficient eradication for a compromise involving evidence of code execution?</p><button class="quiz-opt" data-correct="false">Re-provisioning is always sufficient regardless of compromise type</button><button class="quiz-opt" data-correct="true">If malicious code has been executed and potentially persisted on the device, changing credentials alone doesn't remove that code or persistence mechanism</button><button class="quiz-opt" data-correct="false">Re-provisioning is more disruptive than re-flashing</button><button class="quiz-opt" data-correct="false">Credentials cannot be changed on IoT devices</button>
+        <div class="quiz-explain">Re-provisioning addresses credential-based compromise but doesn't remove persistent malicious code; evidence of code execution generally requires a full re-flash to ensure genuine eradication.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-61: Computer Security Incident Handling Guide (containment/eradication/recovery phases)</li><li>CISA guidance on ICS incident containment strategies</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-12/firmware-flash-network-cloud-evidence-acquisition.html">
+          <span class="dir">← Previous</span>Firmware, Flash Memory, Network & Cloud Evidence Acquisition</a><a class="next" href="../../weeks/week-12/reporting-lessons-learned-tabletop-iot.html">
+          <span class="dir">Next →</span>Reporting, Lessons Learned & Tabletop Exercises for IoT Incidents</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

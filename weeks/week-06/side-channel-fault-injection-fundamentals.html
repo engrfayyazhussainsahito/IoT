@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Side-Channel & Fault-Injection Fundamentals (power analysis, glitching) · IoT &amp; CPS Security</title>
+<meta name="description" content="Explain the principle behind simple power analysis at a conceptual level.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-06/side-channel-fault-injection-fundamentals" data-title="Side-Channel & Fault-Injection Fundamentals (power analysis, glitching)" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-06/index.html">Week 06</a> / Side-Channel & Fault-Injection Fundamentals (power analysis, glitching)</nav>
+<article class="article">
+  <span class="kicker">Week 06 · Lesson 3 · Advanced</span>
+  <h1>Side-Channel & Fault-Injection Fundamentals (power analysis, glitching)</h1>
+  <p class="lede">Explain the principle behind simple power analysis at a conceptual level.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Even a device with a flawless boot chain and a well-locked debug port can leak its
+  secrets through channels that have nothing to do with logical access at all: the power it draws, the time it
+  takes, or what happens if you deliberately make it misbehave for a few nanoseconds at exactly the right moment.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Explain the principle behind simple power analysis at a conceptual level.</li><li>Describe how voltage/clock glitching can skip a security check.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–5 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Power analysis</b> exploits the fact that a chip's power consumption correlates with the
+  data it's processing. <b>Simple Power Analysis (SPA)</b> looks for visually distinguishable patterns in a
+  single power trace (for example, spotting the different number of rounds in an RSA operation depending on a
+  key bit). <b>Differential Power Analysis (DPA)</b> is more powerful: it statistically combines many traces to
+  extract key bits even when no single trace shows an obvious pattern, defeating many naive implementations that
+  "look" constant-time but leak statistically.</p>
+  <p><b>Fault injection</b> deliberately induces a hardware fault — a brief voltage drop, an out-of-spec clock
+  pulse, a targeted laser pulse — timed to corrupt a single instruction or comparison. A classic target: skipping
+  the branch instruction that checks "is this password correct" or "is this signature valid," causing the check
+  to pass regardless of the actual input.</p>
+  <p>These are not purely theoretical: both technique families have moved from academic research into
+  commercially available tooling, meaning the required sophistication has dropped substantially over the past
+  decade.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">sequenceDiagram
+  participant CPU as Device CPU
+  participant Glitch as Fault injector
+  CPU->>CPU: Compute password comparison
+  Glitch-->>CPU: Voltage/clock glitch at precise moment
+  CPU->>CPU: Branch instruction corrupted / skipped
+  CPU->>CPU: Proceeds as if check passed</pre><div class="diagram-caption">The attacker doesn't need to know the correct password — only the precise timing of the check.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Power analysis concepts (SPA/DPA, conceptually)</li><li>Clock/voltage glitching concepts</li><li>Why constant-time code matters here too</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a conceptual takeaway: DPA's power comes from averaging out random noise
+  across many traces while a signal correlated with a secret key bit remains consistent — meaning it isn't
+  defeated by a chip merely being "noisy," only by genuine constant-time, constant-power-profile design or
+  dedicated hardware countermeasures (masking, shielding).</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example, conceptual: a device compares a user-supplied PIN to a stored value using
+  a simple loop that exits early on the first mismatched digit. This creates a timing (and potentially power)
+  signature correlated with how many leading digits were correct — an attacker can incrementally guess the PIN
+  one digit at a time rather than brute-forcing the whole space, entirely through a side channel rather than
+  breaking any cryptography directly.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-c">// Vulnerable: early-exit comparison leaks timing information
+int check_pin(const char *input, const char *stored, int len) {
+    for (int i = 0; i < len; i++) {
+        if (input[i] != stored[i]) return 0;   // exits early -- timing leak
+    }
+    return 1;
+}
+
+// Safer: constant-time comparison, always examines every byte
+int check_pin_constant_time(const char *input, const char *stored, int len) {
+    int diff = 0;
+    for (int i = 0; i < len; i++) {
+        diff |= (input[i] ^ stored[i]);   // no early exit, no data-dependent branch
+    }
+    return diff == 0;
+}</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Side-channel and fault-injection resistance can't be bolted on after the fact the
+  way a firmware patch can — it typically requires re-designing the specific comparison, computation, or
+  hardware layout involved, which is why threat-modeling for these attack classes needs to happen early,
+  especially for any device handling authentication or key material.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Payment card and secure-element certification schemes (Common Criteria, EMVCo)
+  mandate specific, audited testing against both power-analysis and fault-injection attack classes — a
+  recognition that commercial-grade tooling has made these attacks practical enough to require formal defense.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Side-channel research continues to find new leakage sources in increasingly complex
+  systems (cache-timing side channels in higher-end SoCs, electromagnetic emanation analysis) — this remains one
+  of the most active subfields in hardware security research.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Fault-injection techniques have been used in documented research to bypass secure-boot
+  signature checks and debug lockouts alike on commercial devices, underscoring that these aren't purely academic
+  concerns for products with a meaningful threat model that includes a well-resourced physical attacker.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Side-channel attacks require nation-state-level resources." — Commercially available tooling has substantially lowered the barrier to entry for many of these techniques.</li><li>"Constant-time code alone defeats all side-channel attacks." — It defeats timing side channels specifically; power and electromagnetic side channels require additional hardware-level countermeasures.</li><li>"If my code has no secret-dependent branches, it's automatically DPA-resistant." — DPA can extract information even from code without explicit secret-dependent branches, since power consumption correlates with the actual data values being processed, not just control flow.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Power analysis concepts (SPA/DPA, conceptually)</li><li>Clock/voltage glitching concepts</li><li>Why constant-time code matters here too</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Side-channel attack</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An attack that extracts secret information from a system's physical characteristics (timing, power, electromagnetic emissions) rather than breaking its logic or cryptography directly.</dd><dt><b>Fault injection</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Deliberately inducing a hardware fault (voltage glitch, clock glitch, laser pulse) to corrupt execution at a targeted moment.</dd><dt><b>Constant-time implementation</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Code designed so execution time (and ideally power profile) does not depend on secret data.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What does Differential Power Analysis (DPA) exploit that Simple Power Analysis (SPA) alone often cannot?</p><button class="quiz-opt" data-correct="false">It requires physical destruction of the chip</button><button class="quiz-opt" data-correct="true">Statistical combination of many power traces to extract secrets even when no single trace shows an obvious visual pattern</button><button class="quiz-opt" data-correct="false">It works only on devices with no power source</button><button class="quiz-opt" data-correct="false">It requires the correct password to already be known</button>
+        <div class="quiz-explain">DPA's strength comes from statistically analyzing many traces to find correlations with secret data, succeeding even where a single trace (SPA's approach) shows nothing conclusive.</div></div>
+<div class="quiz-q"><p class="prompt">2. What is the general goal of a fault-injection attack against a security check?</p><button class="quiz-opt" data-correct="false">To permanently destroy the target chip</button><button class="quiz-opt" data-correct="true">To corrupt execution at a precise moment so a security check (like a password comparison) passes incorrectly</button><button class="quiz-opt" data-correct="false">To extract the device's full memory contents directly</button><button class="quiz-opt" data-correct="false">To slow down the device's clock permanently</button>
+        <div class="quiz-explain">Fault injection typically aims to corrupt a specific instruction or comparison at a precise moment, such as causing a security check to erroneously pass.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>"Power Analysis Attacks: Revealing the Secrets of Smart Cards" (Mangard, Oswald, Popp)</li><li>Riscure and NewAE Technology public research on fault injection and power analysis tooling</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-06/debug-test-interfaces-attack-surface.html">
+          <span class="dir">← Previous</span>Debug/Test Interfaces (JTAG, SWD, UART) as Attack Surface</a><a class="next" href="../../weeks/week-06/physical-security-tamper-resistance.html">
+          <span class="dir">Next →</span>Physical Security, Tamper Resistance & Anti-Tamper Design</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alert Triage, Investigation & Threat Hunting in IoT/OT · IoT &amp; CPS Security</title>
+<meta name="description" content="Triage an alert that could be a device fault or a security incident.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-11/alert-triage-investigation-threat-hunting-iot-ot" data-title="Alert Triage, Investigation & Threat Hunting in IoT/OT" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-11/index.html">Week 11</a> / Alert Triage, Investigation & Threat Hunting in IoT/OT</nav>
+<article class="article">
+  <span class="kicker">Week 11 · Lesson 4 · Core</span>
+  <h1>Alert Triage, Investigation & Threat Hunting in IoT/OT</h1>
+  <p class="lede">Triage an alert that could be a device fault or a security incident.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">An analyst staring at an IoT alert faces a question a typical IT analyst rarely does
+  first: is this even an attack, or is it just a device being a device? Answering that well — and knowing how to
+  hunt for the attacks that never trigger an alert at all — is this lesson's focus.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Triage an alert that could be a device fault or a security incident.</li><li>Hunt for slow, low-and-slow compromise patterns across a device fleet.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–10 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Fault vs. attack triage heuristics</b>: IoT devices fail in mundane, non-malicious ways far
+  more often than servers do — a flaky sensor, a battery dying, a firmware bug causing spurious reboots. Useful
+  triage heuristics include checking whether the anomaly correlates with a known environmental factor (a power
+  outage, a firmware rollout), whether it's isolated to a single unit (more likely a hardware fault) or spread
+  across a cohort (more likely a systemic issue, malicious or not), and whether the pattern matches any known
+  attack hypothesis from the previous lesson's detection rules.</p>
+  <p><b>Fleet-wide hunting queries</b> extend Week 10's cohort-baseline thinking to proactive investigation: rather
+  than waiting for an alert, a hunter might query "which devices in this cohort have a firmware version older
+  than the fleet median and have not checked in within the expected interval" — surfacing a population worth
+  investigating even without a triggered alert.</p>
+  <p><b>Escalation paths that include OT engineers</b>: per Week 11's opening lesson, an OT security
+  investigation frequently needs domain expertise a pure security analyst lacks — knowing whether a given sensor
+  reading pattern is physically plausible requires someone who understands the underlying process, not just the
+  security data.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  A[Anomaly detected] --> B{Correlates with known\nenvironmental event?}
+  B -->|Yes| FAULT[Likely benign fault]
+  B -->|No| C{Isolated to one device\nor spread across cohort?}
+  C -->|Isolated| D[Possible hardware fault\nOR targeted attack]
+  C -->|Cohort-wide| E[Possible systemic issue\nOR coordinated attack]
+  D --> F[Escalate with OT engineer\nfor physical plausibility check]
+  E --> F</pre><div class="diagram-caption">Neither branch alone determines malicious intent — physical-plausibility review is often the deciding step.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Fault vs. attack triage heuristics</li><li>Fleet-wide hunting queries</li><li>Escalation paths that include OT engineers</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a triage-time allocation principle: because most IoT anomalies are benign
+  faults rather than attacks, an efficient triage process front-loads the cheapest checks (environmental
+  correlation, cohort-scope) before the most expensive ones (deep forensic investigation), reserving the latter
+  for anomalies that survive the initial cheap filters.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a cohort of temperature sensors in one building wing all report anomalous
+  readings simultaneously. A cheap correlation check reveals a documented HVAC maintenance event in that wing at
+  the same time — the environmental-correlation heuristic resolves this as a benign fault without requiring
+  deeper (and much more time-consuming) forensic investigation.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">IOT ALERT TRIAGE FAST-PATH CHECKLIST
+[ ] Does this correlate with a known environmental/maintenance event?
+    -> If yes, likely benign; document and close.
+[ ] Is this isolated to one device or spread across a cohort?
+    -> Isolated: check hardware fault history for that unit first.
+    -> Cohort-wide: check for a common recent change (firmware,
+       config) across the affected cohort.
+[ ] Does the pattern match a documented detection hypothesis
+    (Lesson 11.3)? -> If yes, follow that hypothesis's specific
+    investigation runbook.
+[ ] Still unresolved after the above? -> Escalate to full
+    investigation, including OT/domain-expert review.</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Efficient IoT triage isn't about being less thorough — it's about sequencing cheap,
+  high-signal checks before expensive ones, since the overwhelming majority of IoT anomalies genuinely are benign
+  faults, and treating every one as a potential attack from the start would make the SOC's workload
+  unsustainable at fleet scale.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Mature OT security teams increasingly build cross-functional triage processes with
+  direct, fast escalation paths to operations/engineering staff, recognizing that security analysts alone often
+  cannot make a confident fault-vs-attack determination for physically-grounded anomalies.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Threat-hunting methodology research for OT/IoT environments continues to develop
+  standardized hunting hypothesis libraries (in the spirit of MITRE ATT&CK for ICS), reducing reliance on
+  individual analyst intuition for what proactive hunting queries are worth running.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Multiple documented incidents show that genuine early-stage attacks were initially
+  misclassified as routine device faults, and were only correctly identified once the anomaly pattern was
+  compared across a wider device cohort — reinforcing the value of the cohort-scope check in this lesson's
+  checklist.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Every IoT anomaly should be treated as a potential attack until fully investigated." — Most IoT anomalies are benign device faults; efficient triage sequences cheap checks first to focus deep investigation where it matters.</li><li>"A security analyst alone can reliably determine if a physical-process anomaly is malicious." — Physical plausibility often requires domain/OT engineering expertise beyond typical security analyst training.</li><li>"Threat hunting only matters after an alert has fired." — Proactive, hypothesis-driven hunting can surface issues that never triggered any automated alert at all.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Fault vs. attack triage heuristics</li><li>Fleet-wide hunting queries</li><li>Escalation paths that include OT engineers</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Threat hunting</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Proactive, hypothesis-driven investigation for signs of compromise, independent of triggered alerts.</dd><dt><b>Fault vs. attack triage</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The process of distinguishing benign device malfunctions from genuinely malicious activity during initial alert investigation.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is checking whether an anomaly correlates with a known environmental event (like scheduled maintenance) a useful early triage step?</p><button class="quiz-opt" data-correct="false">It always definitively proves an attack occurred</button><button class="quiz-opt" data-correct="true">It's a cheap check that can quickly resolve many benign anomalies before committing to expensive, deep forensic investigation</button><button class="quiz-opt" data-correct="false">It replaces the need for any further investigation ever</button><button class="quiz-opt" data-correct="false">Environmental correlation is only relevant for network-based attacks</button>
+        <div class="quiz-explain">Since most IoT anomalies are benign, cheap correlation checks against known environmental or maintenance events can efficiently rule out many false alarms before more resource-intensive investigation is needed.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>MITRE ATT&CK for ICS (hunting hypothesis reference)</li><li>SANS guidance on threat hunting methodology, adapted for OT/IoT contexts</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-11/detection-engineering-rule-lifecycle-iot.html">
+          <span class="dir">← Previous</span>Detection Engineering & Rule Lifecycle for IoT-Specific Threats</a><a class="next" href="../../weeks/week-11/metrics-automation-soc-maturity-iot.html">
+          <span class="dir">Next →</span>Metrics, Automation & SOC Maturity for IoT Fleets</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

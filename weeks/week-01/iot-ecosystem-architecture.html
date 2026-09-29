@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IoT Ecosystem Architecture: Device, Gateway, Cloud, and Data Flow · IoT &amp; CPS Security</title>
+<meta name="description" content="Draw the reference architecture common to most consumer and industrial IoT products.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-01/iot-ecosystem-architecture" data-title="IoT Ecosystem Architecture: Device, Gateway, Cloud, and Data Flow" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-01/index.html">Week 01</a> / IoT Ecosystem Architecture: Device, Gateway, Cloud, and Data Flow</nav>
+<article class="article">
+  <span class="kicker">Week 01 · Lesson 5 · Core</span>
+  <h1>IoT Ecosystem Architecture: Device, Gateway, Cloud, and Data Flow</h1>
+  <p class="lede">Draw the reference architecture common to most consumer and industrial IoT products.</p>
+  <div class="meta-row">
+    <span><b>40 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Almost every IoT product, from a $20 smart plug to a factory's predictive-maintenance
+  platform, is built from the same handful of architectural tiers. Learning this reference model once means you
+  can orient yourself quickly in any new product's documentation for the rest of the course.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Draw the reference architecture common to most consumer and industrial IoT products.</li><li>Identify trust boundaries between device, gateway, and cloud tiers.</li><li>Explain where identity, telemetry, and control commands cross those boundaries.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>The common reference architecture:</p>
+  <ol>
+    <li><b>Device</b> — the physical sensor/actuator with embedded firmware.</li>
+    <li><b>Gateway</b> (optional but common) — bridges constrained local protocols (BLE, Zigbee) to IP networks.</li>
+    <li><b>Broker/ingestion layer</b> — receives telemetry, often via MQTT or a cloud IoT-specific ingestion
+    service.</li>
+    <li><b>Cloud platform</b> — stores device state (often as a "digital twin" or "device shadow"), runs
+    business logic, and exposes APIs.</li>
+    <li><b>Application</b> — the mobile or web app end users interact with.</li>
+  </ol>
+  <p>Each arrow between tiers is a trust boundary, and each tier has both a <b>control-plane</b> path (commands
+  flowing toward the device) and a <b>data-plane</b> path (telemetry flowing away from it) — these often have
+  different security requirements even though they traverse the same physical links.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  DEV[Device] <-->|local protocol| GW[Gateway]
+  GW <-->|TLS/MQTT| BR[Broker / ingestion]
+  BR <--> CLOUD[(Cloud platform\n+ digital twin)]
+  CLOUD <-->|API| APP[Mobile / web app]
+  CLOUD -.control commands.-> DEV
+  DEV -.telemetry.-> CLOUD</pre><div class="diagram-caption">Control-plane (commands) and data-plane (telemetry) traffic often share links but need separate scrutiny.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Device → gateway → broker → cloud → app reference model</li><li>Trust boundaries and where they leak</li><li>Control-plane vs. data-plane traffic</li><li>Where OTA updates and provisioning fit</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a boundary-counting exercise: for a 5-tier architecture like the one
+  above, there are at least 4 major trust boundaries (device↔gateway, gateway↔broker, broker↔cloud, cloud↔app),
+  each requiring its own authentication, integrity, and authorization analysis. Skipping analysis of even one
+  boundary leaves a gap.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a smart lock's "unlock" command originates in the mobile app, crosses the
+  app↔cloud boundary, the cloud↔broker boundary, the broker↔gateway boundary (if present), and finally the
+  gateway↔device boundary — four separate places where the command could be spoofed, delayed, or tampered with
+  before it ever reaches the lock's motor.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">BOUNDARY INVENTORY TEMPLATE
+Tier pair            | Protocol       | Auth mechanism        | Notes
+----------------------------------------------------------------------
+App <-> Cloud         | HTTPS/REST     | OAuth2 user token      |
+Cloud <-> Broker       | MQTT over TLS  | Client cert per device |
+Broker <-> Gateway      | MQTT           | Pre-shared key         |
+Gateway <-> Device       | BLE/Zigbee     | Network key            |
+
+Fill this out for any real product before threat modeling it --
+gaps in this table ARE the gaps in your threat model.</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>The most consequential architectural decision for security is usually not any
+  single control, but where each trust boundary is drawn and whether device identity is verified independently
+  at every one of them, rather than trusted transitively after the first hop.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Cloud IoT platforms (device shadows, digital twins) exist partly to let the cloud
+  reason about expected device state even when the device itself is offline — a useful reliability feature that
+  also becomes a security-relevant target, since manipulating the shadow can sometimes influence what commands
+  get queued for the device.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Research on IoT architecture security consistently finds that vulnerabilities cluster
+  at tier boundaries — precisely because each tier is often built and secured by a different team with different
+  assumptions about what the "other side" already validated.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A common real-world finding: the cloud correctly authenticates the mobile app, and the device
+  correctly authenticates the gateway, but the gateway itself implicitly trusts anything arriving from the cloud
+  without independent verification — a classic transitive-trust gap sitting exactly at a boundary this
+  reference model would have flagged.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"If the cloud is secure, the whole system is secure." — Security at one tier doesn't guarantee security at the boundaries connecting to the next tier.</li><li>"Gateways are just dumb relays with nothing to secure." — Gateways are a full trust boundary and common weak link.</li><li>"Control-plane and data-plane traffic need the same protections." — Command integrity (control-plane) is often more safety-critical than telemetry confidentiality (data-plane).</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Device → gateway → broker → cloud → app reference model</li><li>Trust boundaries and where they leak</li><li>Control-plane vs. data-plane traffic</li><li>Where OTA updates and provisioning fit</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Digital twin / device shadow</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A cloud-side representation of a device's expected or last-known state, usable even when the device is offline.</dd><dt><b>Control plane</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The path along which commands and configuration flow toward a device.</dd><dt><b>Data plane</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The path along which telemetry and sensor data flow away from a device.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. In the 5-tier IoT reference architecture, what is a 'digital twin' or 'device shadow' primarily used for?</p><button class="quiz-opt" data-correct="false">Physically duplicating the device for backup</button><button class="quiz-opt" data-correct="true">Representing expected/last-known device state in the cloud, including when the device is offline</button><button class="quiz-opt" data-correct="false">Encrypting all telemetry automatically</button><button class="quiz-opt" data-correct="false">Replacing the need for authentication</button>
+        <div class="quiz-explain">A digital twin/device shadow lets cloud logic and apps interact with a representation of device state even when the device itself isn't currently connected.</div></div>
+<div class="quiz-q"><p class="prompt">2. Why do vulnerabilities commonly cluster at tier boundaries in IoT architectures?</p><button class="quiz-opt" data-correct="false">Boundaries are always unencrypted</button><button class="quiz-opt" data-correct="true">Different teams often build and secure each tier with different assumptions about what the adjoining tier already validated</button><button class="quiz-opt" data-correct="false">Boundaries don't actually carry any security-relevant traffic</button><button class="quiz-opt" data-correct="false">This is a myth with no evidence</button>
+        <div class="quiz-explain">Transitive-trust gaps commonly form when each tier assumes the neighboring tier already performed validation that, in practice, nobody actually did.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>AWS IoT / Azure IoT Hub architecture reference documentation</li><li>OWASP IoT Top 10 (architecture-related items)</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-01/ethics-law-and-responsible-disclosure-for-hardware.html">
+          <span class="dir">← Previous</span>Ethics, Law & Responsible Disclosure for Hardware & CPS Research</a><a class="next" href="../../weeks/week-02/embedded-operating-systems-from-first-principles.html">
+          <span class="dir">Next →</span>Embedded Operating Systems & RTOS From First Principles</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

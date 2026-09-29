@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Post-Quantum Cryptography & Crypto Agility for Constrained Devices · IoT &amp; CPS Security</title>
+<meta name="description" content="Explain the timeline pressure PQC creates for long-lived devices.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-15/post-quantum-crypto-agility-constrained-devices" data-title="Post-Quantum Cryptography & Crypto Agility for Constrained Devices" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-15/index.html">Week 15</a> / Post-Quantum Cryptography & Crypto Agility for Constrained Devices</nav>
+<article class="article">
+  <span class="kicker">Week 15 · Lesson 3 · Advanced</span>
+  <h1>Post-Quantum Cryptography & Crypto Agility for Constrained Devices</h1>
+  <p class="lede">Explain the timeline pressure PQC creates for long-lived devices.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 3 built crypto-agility into fleet key management as a general hygiene practice.
+  This lesson explains the single biggest reason that agility will actually get exercised industry-wide: the
+  eventual arrival of cryptographically relevant quantum computers, and what that means for a device shipping
+  today that might still be running in fifteen years.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Explain the timeline pressure PQC creates for long-lived devices.</li><li>Evaluate PQC algorithm candidates against constrained-device budgets.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–14 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>The urgency comes from a timeline mismatch: a device manufactured today with a 10-20 year
+  expected field life may still be operating well past the point when large-scale quantum computers become
+  capable of breaking current public-key cryptography (RSA, ECC) — meaning today's key exchange and signature
+  schemes have a real, non-hypothetical expiration date for long-lived devices, even though the exact timing
+  remains uncertain.</p>
+  <p><b>NIST's PQC (Post-Quantum Cryptography) standardization</b> selected several algorithm families (lattice-based
+  schemes like ML-KEM and ML-DSA, among others) as new standards designed to resist quantum attacks — these
+  differ meaningfully in key/signature size and compute cost from today's ECC, requiring real engineering
+  evaluation against Week 3's constrained-device budget framework, not a drop-in replacement assumption.</p>
+  <p><b>Hybrid classical+PQC transition strategies</b> — using both a classical algorithm and a PQC algorithm
+  together during the transition period — hedge against the possibility that a newly standardized PQC algorithm
+  might itself later be found to have an undiscovered weakness, providing defense in depth during a period of
+  relative cryptographic immaturity for these new schemes.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  SHIP[Device shipped today] --> LIFE[10-20 year expected\nfield lifespan]
+  LIFE -.overlaps with.-> QUANTUM[Uncertain but real\nquantum-computing timeline]
+  QUANTUM -.breaks.-> CLASSICAL[Classical RSA/ECC\nkey exchange and signatures]
+  HYBRID[Hybrid classical+PQC] -.hedges against.-> QUANTUM</pre><div class="diagram-caption">The exact quantum timeline is uncertain, but device lifespans are long enough that the risk is real, not purely theoretical.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Why 10-20 year device life meets PQC urgency</li><li>NIST PQC finalists at a conceptual level</li><li>Hybrid classical+PQC transition strategies</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a lifespan-risk framing: if a device's expected field life extends
+  meaningfully past even a conservative estimate of when quantum computers could threaten current
+  cryptography, that device's crypto-agility (Week 3) isn't optional future-proofing — it's a near-certain
+  future requirement given its own lifespan alone.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: an industrial sensor with a 15-year expected field life is being designed
+  today. Given PQC algorithms' larger key/signature sizes compared to current ECC, the design team evaluates
+  whether the device's constrained memory and bandwidth budget (Week 3) can accommodate a future PQC or hybrid
+  scheme via an OTA update (Week 4), building that headroom into the initial hardware selection rather than
+  discovering the constraint is unworkable a decade into the device's field life.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">PQC READINESS ASSESSMENT FOR LONG-LIVED DEVICES
+Expected field lifespan: ________ years
+Current crypto scheme: ________________________________
+Does hardware have headroom (memory, compute) for larger PQC
+  key/signature sizes if needed via future OTA update? [ ] Y [ ] N
+Is the OTA pipeline (Week 4) itself crypto-agile, or does it depend
+  on the very algorithms being potentially replaced? ________________
+Hybrid transition strategy considered? [ ] Y [ ] N</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>The most subtle risk in PQC planning is a circular dependency: if a device's OTA
+  update mechanism itself relies on the classical cryptography that PQC migration is meant to replace, updating
+  to a new scheme via that same mechanism requires careful sequencing to avoid a chicken-and-egg security gap.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Major cloud and browser vendors have already begun deploying hybrid classical+PQC
+  schemes in production TLS implementations, providing real-world engineering precedent for the transition
+  approach constrained-device designers can draw on rather than starting from theory alone.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>NIST's PQC standardization process remains an active area with ongoing
+  cryptanalysis of both selected and candidate algorithms — crypto-agility's value is partly insurance against
+  this genuine, acknowledged immaturity in even the newly standardized schemes.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Organizations planning multi-decade infrastructure (smart grid components, industrial control
+  systems) have begun explicit PQC-readiness assessments specifically because these systems' expected lifespans
+  make the quantum timeline risk concrete rather than abstract, unlike shorter-lived consumer electronics.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Quantum computers capable of breaking current cryptography already exist today." — They do not yet exist at the scale needed, but the timeline uncertainty combined with long device lifespans still makes planning necessary now.</li><li>"PQC algorithms are drop-in replacements for current ECC with no engineering impact." — They typically have different key/signature sizes and compute costs requiring real evaluation against a device's constrained budget.</li><li>"Crypto agility only matters for post-quantum migration." — It's valuable for any future algorithm weakness discovery, with PQC being the most prominent current driver.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Why 10-20 year device life meets PQC urgency</li><li>NIST PQC finalists at a conceptual level</li><li>Hybrid classical+PQC transition strategies</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Post-quantum cryptography (PQC)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Cryptographic algorithms designed to remain secure against attacks from large-scale quantum computers.</dd><dt><b>Hybrid cryptography</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Using both a classical and a post-quantum algorithm together during a transition period, for defense in depth.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is post-quantum cryptography planning relevant today even though large-scale quantum computers don't yet exist?</p><button class="quiz-opt" data-correct="false">It isn't actually relevant yet and can be safely ignored</button><button class="quiz-opt" data-correct="true">Devices shipped today may have 10-20 year field lifespans that could overlap with a future quantum-computing timeline capable of breaking current cryptography</button><button class="quiz-opt" data-correct="false">PQC algorithms are required by law for all new devices today</button><button class="quiz-opt" data-correct="false">Quantum computers already exist and are actively breaking encryption</button>
+        <div class="quiz-explain">Given uncertain but real timelines for quantum computing advancement, and the long field lifespans of many devices, planning for crypto agility and eventual PQC migration needs to start well before the risk is imminent.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST Post-Quantum Cryptography Standardization project documentation</li><li>NIST guidance on migration to post-quantum cryptography (SP 1800-38 series)</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-15/zero-trust-at-scale-identity-centric-iot-ot.html">
+          <span class="dir">← Previous</span>Zero Trust at Scale & Identity-Centric Architecture for IoT/OT</a><a class="next" href="../../weeks/week-15/edge-ml-security-model-governance.html">
+          <span class="dir">Next →</span>AI at the Edge: Edge-ML Security & Model Governance</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

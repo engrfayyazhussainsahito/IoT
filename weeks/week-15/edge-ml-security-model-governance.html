@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI at the Edge: Edge-ML Security & Model Governance · IoT &amp; CPS Security</title>
+<meta name="description" content="Identify attack surface introduced by on-device ML models.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-15/edge-ml-security-model-governance" data-title="AI at the Edge: Edge-ML Security & Model Governance" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-15/index.html">Week 15</a> / AI at the Edge: Edge-ML Security & Model Governance</nav>
+<article class="article">
+  <span class="kicker">Week 15 · Lesson 4 · Advanced</span>
+  <h1>AI at the Edge: Edge-ML Security & Model Governance</h1>
+  <p class="lede">Identify attack surface introduced by on-device ML models.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">As machine learning models move from the cloud onto the edge device itself — for
+  latency, privacy, or bandwidth reasons echoing Week 14's data-minimization material — they bring an entirely
+  new category of attack surface that this course hasn't yet directly addressed: attacks against the model
+  itself, not just the software running it.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Identify attack surface introduced by on-device ML models.</li><li>Apply model-governance practices to models deployed on constrained hardware.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–14 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Model extraction and inversion risk</b>: an attacker with access to a deployed edge model
+  (via the device's normal inference interface, or via physical extraction per Week 6's hardware techniques) may
+  be able to reconstruct a close approximation of the model itself (extraction) or infer sensitive information
+  about the data it was trained on (inversion) — risks that don't exist for traditional software logic in the
+  same way.</p>
+  <p><b>Adversarial input risk</b> for edge sensors means crafting physical-world inputs (a specially patterned
+  sticker on a stop sign, for a vision model; a specific acoustic pattern, for an audio model) designed to cause
+  a model to misclassify — a physical-world analog to the input-validation concerns from Week 4, but targeting
+  the model's learned behavior rather than a traditional parser's logic.</p>
+  <p><b>Model update governance</b> extends Week 4's OTA integrity material to model weights specifically:
+  a model update needs the same signed, verified delivery as firmware, since a maliciously modified model could
+  be tuned to fail in specific, attacker-chosen ways without the deployed system otherwise showing any obvious
+  sign of compromise.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  MODEL[Deployed edge model] --> EXT[Model extraction:\nreconstruct via queries]
+  MODEL --> INV[Model inversion:\ninfer training data]
+  MODEL --> ADV[Adversarial input:\ncraft misleading real-world input]
+  MODEL --> UPD[Model update integrity\n-- extends Week 4 OTA]</pre><div class="diagram-caption">Each attack targets the model's learned behavior specifically, distinct from traditional software vulnerabilities.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Model extraction/inversion risk on-device</li><li>Adversarial input risk for edge sensors</li><li>Model update governance</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a threat-surface question specific to ML: for a given edge model, what
+  real-world physical input could an attacker plausibly craft and place in the model's field of sensing (camera
+  view, microphone range, sensor input) to trigger a misclassification, and what real-world consequence would
+  that misclassification have?</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: an edge-deployed computer-vision model for an industrial safety system is
+  evaluated for adversarial robustness by testing whether small, physically realistic perturbations (dirt,
+  stickers, lighting changes) could cause it to fail to detect a safety-relevant condition — treating this as a
+  safety-critical testing requirement (echoing Week 1's safety-first framing) rather than purely an ML
+  performance metric.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">EDGE ML SECURITY REVIEW CHECKLIST
+[ ] Model update delivery uses the same signed, verified pipeline
+    as firmware updates (Week 4)
+[ ] Model's inference interface rate-limited/monitored to raise
+    the cost of extraction-via-query attacks
+[ ] Adversarial robustness testing performed for physically
+    realistic perturbations relevant to the model's deployment
+    environment
+[ ] Training data sensitivity assessed for inversion risk if the
+    model itself could leak information about it</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Edge ML security requires threat-modeling the model itself as a distinct asset,
+  not just the code running around it — a perfectly secure software implementation can still ship a model with
+  serious extraction, inversion, or adversarial-robustness weaknesses that traditional application security
+  review wouldn't catch.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Organizations deploying safety-relevant edge ML (autonomous systems, industrial
+  vision systems) increasingly treat adversarial robustness testing as a required pre-deployment gate, similar in
+  spirit to the fuzzing requirement from Week 5 for traditional firmware.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Adversarial machine learning remains a highly active research area, with an ongoing
+  back-and-forth between new attack techniques and new defensive/robustness methods — practitioners should expect
+  this to remain a moving target rather than a solved problem for the foreseeable future.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Published research has repeatedly demonstrated successful adversarial attacks against
+  real-world deployed vision systems using physically realizable perturbations (not just digital, pixel-level
+  manipulation), directly validating the practical, not just theoretical, nature of this risk category.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Edge ML security is just standard software/firmware security applied to a model file." — Model extraction, inversion, and adversarial input are distinct attack categories targeting the model's learned behavior specifically.</li><li>"Adversarial attacks only work in controlled digital/pixel-level scenarios, not the real physical world." — Physically realizable adversarial perturbations have been repeatedly demonstrated in research against real deployed systems.</li><li>"Model updates don't need the same integrity protection as firmware updates." — A maliciously modified model can be tuned to fail in specific, attacker-chosen ways, warranting the same signed-update rigor as firmware.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Model extraction/inversion risk on-device</li><li>Adversarial input risk for edge sensors</li><li>Model update governance</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Model extraction</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An attack that attempts to reconstruct a deployed machine learning model's parameters or behavior through repeated querying.</dd><dt><b>Adversarial input</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A specially crafted input designed to cause a machine learning model to misclassify or behave incorrectly.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What distinguishes an 'adversarial input' attack against an edge ML model from a typical software input-validation vulnerability?</p><button class="quiz-opt" data-correct="false">They are functionally identical concepts</button><button class="quiz-opt" data-correct="true">An adversarial input is a specially crafted real-world input designed to exploit the model's learned behavior to cause misclassification, rather than exploiting a parsing/logic bug</button><button class="quiz-opt" data-correct="false">Adversarial inputs only exist in theoretical research with no real-world demonstration</button><button class="quiz-opt" data-correct="false">Adversarial attacks require physical access to the device's hardware</button>
+        <div class="quiz-explain">Adversarial inputs specifically target a model's learned decision boundaries to cause misclassification, a fundamentally different attack surface than traditional software parsing or logic vulnerabilities.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST AI Risk Management Framework</li><li>Research on physically realizable adversarial attacks against deployed vision systems</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-15/post-quantum-crypto-agility-constrained-devices.html">
+          <span class="dir">← Previous</span>Post-Quantum Cryptography & Crypto Agility for Constrained Devices</a><a class="next" href="../../weeks/week-15/secure-by-design-resilience-future-ready-iot.html">
+          <span class="dir">Next →</span>Secure-by-Design, Cyber Resilience & Future-Ready IoT Programs</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

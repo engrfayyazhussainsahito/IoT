@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ethics, Law & Responsible Disclosure for Hardware & CPS Research · IoT &amp; CPS Security</title>
+<meta name="description" content="Apply responsible disclosure norms to hardware and firmware findings.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-01/ethics-law-and-responsible-disclosure-for-hardware" data-title="Ethics, Law & Responsible Disclosure for Hardware & CPS Research" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-01/index.html">Week 01</a> / Ethics, Law & Responsible Disclosure for Hardware & CPS Research</nav>
+<article class="article">
+  <span class="kicker">Week 01 · Lesson 4 · Core</span>
+  <h1>Ethics, Law & Responsible Disclosure for Hardware & CPS Research</h1>
+  <p class="lede">Apply responsible disclosure norms to hardware and firmware findings.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Finding a vulnerability in a device is only half the job. What you do next —
+  who you tell, when, and how — determines whether your work makes users safer or just makes you a target for
+  legal risk with nothing fixed. Hardware and RF findings add wrinkles that web security's disclosure norms
+  don't fully anticipate.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Apply responsible disclosure norms to hardware and firmware findings.</li><li>Recognize jurisdictional traps specific to RF and imported hardware.</li><li>Draft a disclosure timeline for a hypothetical device vulnerability.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Coordinated Vulnerability Disclosure (CVD) follows a broadly consistent pattern across the
+  industry: privately notify the vendor, agree on (or default to) a disclosure timeline (commonly 90 days),
+  and publish details only after a fix is available or the timeline expires. For hardware, three extra
+  complications show up:</p>
+  <ul>
+    <li><b>No security contact exists.</b> Many hardware vendors, especially smaller ones, have no
+    security.txt, no bug-bounty program, and no obvious inbox — you may need to go through general support
+    channels or a CERT/CC-style coordinator.</li>
+    <li><b>Fixes require a physical recall or OTA capability the vendor may not have.</b> Unlike software,
+    "just ship a patch" assumes an update mechanism exists at all.</li>
+    <li><b>RF and import/export law vary by jurisdiction</b> and can affect what testing and even what
+    equipment is legal to use, independent of the disclosure question entirely.</li>
+  </ul>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">timeline
+  title Coordinated Vulnerability Disclosure (typical)
+  Day 0 : Private report to vendor
+  Day 0-14 : Vendor acknowledges, begins triage
+  Day 14-75 : Vendor develops and tests fix
+  Day 90 : Default public disclosure deadline (extendable by mutual agreement)
+  Day 90+ : Public advisory + technical write-up</pre><div class="diagram-caption">Timelines are norms, not universal law — extend in good faith when a vendor is actively working the fix.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>CVD (coordinated vulnerability disclosure) timelines</li><li>Working with vendors who have no security contact</li><li>Import/export and radio-spectrum legal considerations</li><li>Case pattern: researcher vs. vendor silence</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula, but a decision checklist that functions the same way: before publishing anything,
+  confirm (1) the vendor was notified with reasonable lead time, (2) a fix exists or the agreed timeline has
+  passed, and (3) your write-up doesn't include a ready-to-use exploit against still-vulnerable deployed units
+  with no update path.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: you find a hardware debug port left enabled on a discontinued smart lock
+  with no OTA capability and no vendor support. There is likely no fix coming. Responsible practice here shifts
+  toward a general advisory (affected model, mitigation advice like physical security or discontinued use)
+  rather than a full exploit write-up that only helps attackers against a fleet that can never be patched.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">DISCLOSURE READINESS CHECKLIST
+[ ] Identified a security contact (security.txt, CERT/CC, support escalation)
+[ ] Sent a clear, factual private report with reproduction steps
+[ ] Proposed or accepted a disclosure timeline in writing
+[ ] Confirmed whether the vendor has any update mechanism at all
+[ ] Considered RF/import legal constraints for the testing performed
+[ ] Drafted public write-up to omit unnecessary exploit detail for
+    devices with no realistic fix path</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Security researchers who skip the "does a fix path even exist" question sometimes
+  publish full technical detail for unpatchable hardware, effectively handing attackers a ready-made toolkit
+  against users who have no way to protect themselves. Judgment matters as much as process here.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>National CERT/CC-style coordinators exist specifically to bridge the gap when a
+  vendor has no security contact — using one is often faster and safer than public shaming into action.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Academic ethics boards reviewing hardware security research increasingly ask
+  explicitly about disclosure plans and RF/legal compliance before approving a study — treat this as the
+  professional norm, not an academic-only formality.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A widely discussed pattern in consumer-lock research: researchers found a fundamental design
+  flaw with no patch possible on already-sold units, and chose a general public-safety advisory over a
+  step-by-step exploit guide — prioritizing user protection over technical completeness in the write-up.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"90 days is a legal requirement." — It's an industry norm, not a universal law; timelines are negotiated in good faith.</li><li>"If the vendor ignores me, I should publish immediately out of spite." — A coordinator (CERT/CC-style) is usually a better next step than immediate full disclosure.</li><li>"Hardware disclosure works exactly like web app disclosure." — Physical recall limitations and RF/import law add real complications software-only disclosure doesn't have.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>CVD (coordinated vulnerability disclosure) timelines</li><li>Working with vendors who have no security contact</li><li>Import/export and radio-spectrum legal considerations</li><li>Case pattern: researcher vs. vendor silence</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>CVD</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Coordinated Vulnerability Disclosure — a process of privately notifying a vendor before public disclosure.</dd><dt><b>CERT/CC</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A coordination center that can help route vulnerability reports when a vendor has no direct security contact.</dd><dt><b>security.txt</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A standardized file vendors can publish to indicate how to report security issues.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What should you consider before publishing full exploit detail for a hardware vulnerability?</p><button class="quiz-opt" data-correct="false">Nothing, more detail is always better</button><button class="quiz-opt" data-correct="true">Whether the affected devices have any realistic update or fix path at all</button><button class="quiz-opt" data-correct="false">Only whether 90 days have passed</button><button class="quiz-opt" data-correct="false">Whether the vendor is a large or small company</button>
+        <div class="quiz-explain">If devices have no way to be patched, full exploit detail may only help attackers against users who can't protect themselves — a key ethical consideration.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>CERT/CC Vulnerability Disclosure Guidance</li><li>security.txt standard (RFC 9116)</li><li>ISO/IEC 29147: Vulnerability disclosure</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-01/threat-modeling-for-iot-embedded-systems.html">
+          <span class="dir">← Previous</span>Threat Modeling for IoT/Embedded Systems</a><a class="next" href="../../weeks/week-01/iot-ecosystem-architecture.html">
+          <span class="dir">Next →</span>IoT Ecosystem Architecture: Device, Gateway, Cloud, and Data Flow</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

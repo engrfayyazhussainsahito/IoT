@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RF & SDR-Based Traffic Analysis and Detection · IoT &amp; CPS Security</title>
+<meta name="description" content="Capture and inspect IoT RF traffic with a software-defined radio.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-07/rf-sdr-traffic-analysis-detection" data-title="RF & SDR-Based Traffic Analysis and Detection" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-07/index.html">Week 07</a> / RF & SDR-Based Traffic Analysis and Detection</nav>
+<article class="article">
+  <span class="kicker">Week 07 · Lesson 2 · Core</span>
+  <h1>RF & SDR-Based Traffic Analysis and Detection</h1>
+  <p class="lede">Capture and inspect IoT RF traffic with a software-defined radio.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Everything in the previous lesson about protocol weaknesses is only useful if you can
+  actually observe the traffic in question. A software-defined radio turns a general-purpose computer into a
+  flexible receiver (and, carefully and legally, a transmitter) capable of capturing and analyzing almost any
+  IoT RF signal.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Capture and inspect IoT RF traffic with a software-defined radio.</li><li>Identify anomalous RF patterns that suggest jamming or replay.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–6 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>An <b>SDR</b> (Software-Defined Radio) digitizes raw radio signals and hands them to software
+  for processing, rather than relying on protocol-specific hardware — the same $20-30 device can capture BLE,
+  Zigbee, LoRa, or arbitrary ISM-band traffic depending on the software configuration, making it the single most
+  versatile tool in an IoT security lab.</p>
+  <p><b>Spectrum analysis</b> — viewing signal strength across a frequency range over time (a waterfall display)
+  — is often the fastest way to spot anomalies: unexpected transmissions, unusually frequent retransmissions
+  (which might indicate jamming-induced packet loss), or signals appearing on frequencies where nothing should be
+  transmitting.</p>
+  <p><b>Replay and jamming signatures</b> have recognizable patterns: replay attacks often show identical
+  waveforms repeated at unusual intervals; jamming shows sustained energy across a target frequency band,
+  distinguishable from legitimate burst-style IoT transmissions.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  ANT[Antenna] --> SDR[SDR hardware]
+  SDR --> SW[Capture software\n(GNU Radio, Universal Radio Hacker, etc.)]
+  SW --> WF[Waterfall / spectrum view]
+  SW --> DEC[Protocol decoder]
+  WF --> ANOM[Anomaly spotting]
+  DEC --> REPLAY[Replay/format analysis]</pre><div class="diagram-caption">The same capture can feed both a visual anomaly-spotting workflow and a protocol-level decode.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>SDR capture basics</li><li>Spectrum analysis for anomaly spotting</li><li>Replay and jamming signatures</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a Nyquist-driven practical constraint: an SDR's sample rate must be at
+  least twice the bandwidth of the signal you're trying to capture faithfully. A cheap SDR's typical 2-3 MHz
+  usable bandwidth easily covers a single BLE or Zigbee channel, but capturing wider Wi-Fi-adjacent signals
+  requires more capable (and expensive) hardware.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a waterfall display shows repeated, identical bursts on a garage-door
+  opener's frequency at suspiciously regular intervals with no corresponding legitimate use — a strong candidate
+  for either an automated replay attack in progress or a misbehaving nearby device, both worth investigating
+  further with a protocol-level decode.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">RF ANOMALY TRIAGE CHECKLIST
+[ ] Capture a baseline of NORMAL traffic on the target frequency first
+[ ] Compare suspicious activity against that baseline waterfall
+[ ] Sustained energy across the band -> possible jamming
+[ ] Identical repeated waveforms at irregular but repeated intervals
+    -> possible replay attack
+[ ] Unexpected transmissions on frequencies with no known legitimate
+    device -> investigate unknown/rogue transmitter
+[ ] Decode captured packets at the protocol level to confirm hypothesis
+    before concluding malicious activity (rule out benign causes first)</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>RF monitoring is one of the few detection capabilities that can catch an attack at
+  the physical layer, before it ever reaches a network log — valuable specifically because many IoT attacks
+  (jamming, replay) leave no trace at all in conventional network-based monitoring.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Physical security and facilities teams increasingly deploy dedicated RF monitoring
+  appliances for exactly this reason — detecting rogue transmitters, jamming attempts, or unauthorized wireless
+  devices on a site that traditional IT security tooling has no visibility into.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Academic research into RF fingerprinting (identifying individual transmitters by
+  subtle hardware-specific signal characteristics, beyond just protocol-level identifiers) is an active area with
+  applications in both attack detection and device authentication.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Documented vehicle and garage-door relay/replay research has relied heavily on SDR-based
+  capture and analysis exactly like the workflow in this lesson, demonstrating real-world practicality of the
+  technique for both defenders monitoring their own systems and researchers studying vulnerable products.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"You need expensive, specialized hardware to do meaningful RF analysis." — A basic $20-30 SDR dongle can capture most common IoT protocols effectively for initial analysis.</li><li>"Any unusual RF activity means an attack is happening." — Legitimate causes (misconfigured devices, nearby unrelated equipment) are common; always rule these out before concluding malicious activity.</li><li>"RF monitoring can replace network-based detection." — They're complementary; RF monitoring catches physical-layer issues that never reach the network, but network monitoring catches issues invisible at the RF layer.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>SDR capture basics</li><li>Spectrum analysis for anomaly spotting</li><li>Replay and jamming signatures</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>SDR (Software-Defined Radio)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A radio receiver/transmitter that digitizes signals for flexible, software-based processing rather than relying on fixed, protocol-specific hardware.</dd><dt><b>Waterfall display</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A spectrum-analysis visualization showing signal strength across frequency and time.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What does a 'waterfall' display in spectrum analysis typically show?</p><button class="quiz-opt" data-correct="false">A list of device IP addresses</button><button class="quiz-opt" data-correct="true">Signal strength across a frequency range over time, useful for spotting anomalies visually</button><button class="quiz-opt" data-correct="false">Firmware version history</button><button class="quiz-opt" data-correct="false">Encrypted payload contents in plaintext</button>
+        <div class="quiz-explain">A waterfall display visualizes signal strength across frequency and time, making it easy to spot unexpected transmissions, sustained jamming, or repeated replay-like patterns.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>GNU Radio and Universal Radio Hacker (URH) documentation</li><li>RTL-SDR community resources on capture and analysis basics</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-07/wireless-iot-protocol-fundamentals.html">
+          <span class="dir">← Previous</span>Wireless/IoT Protocol Fundamentals (BLE, Zigbee/Thread, LoRaWAN, Z-Wave, NFC/RFID)</a><a class="next" href="../../weeks/week-07/network-segmentation-zero-trust-iot-ot.html">
+          <span class="dir">Next →</span>Network Segmentation & Zero Trust for IoT/OT Networks</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

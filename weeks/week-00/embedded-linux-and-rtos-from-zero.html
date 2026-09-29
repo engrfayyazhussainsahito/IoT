@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embedded Linux & RTOS From Zero · IoT &amp; CPS Security</title>
+<meta name="description" content="Contrast general-purpose Linux with embedded Linux and RTOS design goals.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-00/embedded-linux-and-rtos-from-zero" data-title="Embedded Linux & RTOS From Zero" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-00/index.html">Week 00</a> / Embedded Linux & RTOS From Zero</nav>
+<article class="article">
+  <span class="kicker">Week 00 · Lesson 2 · Foundations</span>
+  <h1>Embedded Linux & RTOS From Zero</h1>
+  <p class="lede">Contrast general-purpose Linux with embedded Linux and RTOS design goals.</p>
+  <div class="meta-row">
+    <span><b>45 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Most security intuition is built on general-purpose operating systems: multiple users,
+  a filesystem hierarchy, and a kernel that assumes it's talking to a human at a terminal eventually. Embedded
+  targets break almost every one of those assumptions, and the break points are exactly where security controls
+  either exist or quietly don't.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Contrast general-purpose Linux with embedded Linux and RTOS design goals.</li><li>Trace the boot sequence from ROM to init on a constrained device.</li><li>Identify where security controls live differently on embedded targets.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>No prior lessons required — this is the course's starting point.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Embedded Linux (Buildroot, Yocto, OpenWrt-style builds) trims a general-purpose kernel and
+  userspace down to what a specific product needs — often a read-only root filesystem, a handful of daemons,
+  and no interactive shell in production. An RTOS (FreeRTOS, Zephyr) goes further: no process isolation in the
+  traditional sense, a small number of cooperating or preemptively scheduled tasks, and — on many chips — no
+  memory protection unit separating them at all.</p>
+  <ul>
+    <li><b>Boot sequence</b>: boot ROM (immutable, burned at fab) → first-stage bootloader → second-stage
+    bootloader (U-Boot, MCUboot) → kernel/scheduler → init/first task.</li>
+    <li><b>Filesystem model</b>: read-only base image plus a small writable overlay for configuration and logs,
+    so a factory reset is just "discard the overlay."</li>
+    <li><b>Task model</b>: an RTOS typically runs all tasks in the same address space; a bug in one task can
+    corrupt another's memory with no OS-level wall between them.</li>
+  </ul>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  ROM[Boot ROM - immutable] --> BL1[First-stage bootloader]
+  BL1 --> BL2[Second-stage bootloader\n(U-Boot / MCUboot)]
+  BL2 --> KERNEL[Kernel or RTOS scheduler]
+  KERNEL --> INIT[Init process / first task]
+  INIT --> APP[Application firmware]
+  style ROM fill:#f2e3d3,stroke:#b5560f</pre><div class="diagram-caption">Each stage must verify the next before handing off execution — this chain returns in Week 6.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Buildroot/Yocto vs. desktop distros</li><li>FreeRTOS/Zephyr task and memory model</li><li>Boot stages: ROM → bootloader → kernel/scheduler → init</li><li>Read-only rootfs and overlay filesystems</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formal math here, but a useful mental model: think of trust as <em>non-increasing</em>
+  across the boot chain. Stage <code>N</code> can never grant more trust to stage <code>N+1</code> than it
+  itself was verified to have. Break that rule anywhere and the whole chain's guarantee collapses.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>On a typical embedded Linux device, <code>/</code> is mounted read-only from a squashfs
+  image, while <code>/data</code> or <code>/overlay</code> is a small writable partition. A factory reset button
+  usually just wipes that overlay partition and reboots — the base OS image never changes. Understanding this
+  is the difference between "I patched it" and "I edited a file that will vanish on next reset."</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-bash"># Typical embedded Linux mount layout (inspecting from a UART shell)
+$ mount
+/dev/mtdblock0 on /        type squashfs (ro,relatime)
+/dev/mtdblock3 on /overlay type jffs2    (rw,relatime)
+overlay on /etc            type overlay (rw,...)
+
+# Read-only root means a naive "rm -rf" of a malicious file on / will fail --
+# but anything written under /overlay survives reboot and factory logic.</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Read-only rootfs is itself a security control: it limits where persistent malware
+  can live without re-flashing the device. But it's a control that developers sometimes accidentally weaken by
+  mounting more than necessary as read-write "for convenience" during development — and shipping that config.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Vendors increasingly use A/B (dual-bank) partition schemes so an OTA update writes
+  to the inactive bank and only switches over after verification — this pattern shows up again in Week 4's
+  OTA lesson and is one of the highest-leverage reliability-and-security investments a product team can make.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Academic surveys of consumer IoT firmware consistently find debug shells, default
+  credentials, or writable-by-default filesystems left over from development builds — the boot-and-filesystem
+  model you learn here is exactly what those audits check first.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A recurring firmware-audit finding: a device ships with its root filesystem mounted read-write
+  "temporarily" for a development sprint, and the setting is never reverted before mass production. The result
+  is a device where any code-execution bug becomes trivially persistent, because nothing stops it from writing
+  itself to disk.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Read-only rootfs means the device can't be compromised persistently." — Persistence can still live in writable overlay partitions or external storage.</li><li>"An RTOS is just a tiny Linux." — Most RTOSes have no process isolation at all; a bug in one task can corrupt every other task's memory.</li><li>"Boot ROM code doesn't matter, it's just glue." — Boot ROM is usually the one stage that can never be patched after fabrication, making its bugs permanent.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Buildroot/Yocto vs. desktop distros</li><li>FreeRTOS/Zephyr task and memory model</li><li>Boot stages: ROM → bootloader → kernel/scheduler → init</li><li>Read-only rootfs and overlay filesystems</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Boot ROM</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Immutable code burned into silicon at manufacturing time; the first and most trusted link in a device's boot chain.</dd><dt><b>Overlay filesystem</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A small writable layer mounted over a read-only base image, used for configuration and logs.</dd><dt><b>A/B partitioning</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A dual-bank update scheme where updates write to an inactive partition before switching over.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why do many embedded Linux devices mount their root filesystem read-only?</p><button class="quiz-opt" data-correct="false">It's faster to boot</button><button class="quiz-opt" data-correct="true">It limits where persistent malicious code can be written without reflashing</button><button class="quiz-opt" data-correct="false">It saves battery power</button><button class="quiz-opt" data-correct="false">It's required by Wi-Fi certification</button>
+        <div class="quiz-explain">A read-only root filesystem constrains persistence: an attacker who can't write to / must rely on a small writable overlay, which is easier to monitor and wipe.</div></div>
+<div class="quiz-q"><p class="prompt">2. What is the key difference between an RTOS task model and a general-purpose OS process model?</p><button class="quiz-opt" data-correct="false">RTOS tasks run faster</button><button class="quiz-opt" data-correct="true">RTOS tasks typically share one address space with no memory isolation between them</button><button class="quiz-opt" data-correct="false">RTOS tasks always run on multiple cores</button><button class="quiz-opt" data-correct="false">RTOS tasks use more memory than processes</button>
+        <div class="quiz-explain">Most RTOS designs skip memory protection between tasks for simplicity and speed, meaning a bug in one task can corrupt another's state.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>Yocto Project and Buildroot documentation</li><li>FreeRTOS and Zephyr RTOS architecture guides</li><li>MCUboot secure bootloader project documentation</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-00/lab-readiness-safety-and-legal-boundaries.html">
+          <span class="dir">← Previous</span>Lab Readiness, Safety & Legal Boundaries for Hardware Hacking</a><a class="next" href="../../weeks/week-00/electronics-and-hardware-fundamentals.html">
+          <span class="dir">Next →</span>Electronics & Hardware Fundamentals for Security Learners</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

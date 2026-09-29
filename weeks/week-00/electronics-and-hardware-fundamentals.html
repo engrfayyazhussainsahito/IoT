@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electronics & Hardware Fundamentals for Security Learners · IoT &amp; CPS Security</title>
+<meta name="description" content="Read a datasheet well enough to find security-relevant pins and modes.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-00/electronics-and-hardware-fundamentals" data-title="Electronics & Hardware Fundamentals for Security Learners" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-00/index.html">Week 00</a> / Electronics & Hardware Fundamentals for Security Learners</nav>
+<article class="article">
+  <span class="kicker">Week 00 · Lesson 3 · Foundations</span>
+  <h1>Electronics & Hardware Fundamentals for Security Learners</h1>
+  <p class="lede">Read a datasheet well enough to find security-relevant pins and modes.</p>
+  <div class="meta-row">
+    <span><b>40 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">You don't need an electrical engineering degree to find the interfaces that matter
+  for security, but you do need enough fluency to read a datasheet, recognize a bus, and probe a board without
+  destroying it. This lesson is that fluency, aimed squarely at what you'll actually use in Weeks 2 and 6.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Read a datasheet well enough to find security-relevant pins and modes.</li><li>Identify common buses (UART, I2C, SPI, JTAG/SWD) on a populated board.</li><li>Explain voltage domains and why they matter for safe probing.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>No prior lessons required — this is the course's starting point.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Four things carry almost all of the security-relevant signal on a typical IoT board:</p>
+  <ul>
+    <li><b>Voltage domains</b> — most microcontrollers run at 3.3V logic; connecting a 5V signal directly can
+    damage the chip. Always check before probing.</li>
+    <li><b>Serial buses</b> — UART (two wires, simple async serial, often a debug console), I2C (two wires,
+    shared bus, addressable peripherals), and SPI (four wires, fast, point-to-point) cover most on-board
+    communication.</li>
+    <li><b>Debug interfaces</b> — JTAG and SWD expose direct access to a chip's internals for programming and
+    debugging, and are a recurring theme in Week 6.</li>
+    <li><b>Test points</b> — unpopulated pads or headers on a board are often leftover debug/manufacturing
+    access points that never got disabled for production.</li>
+  </ul>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  MCU[Microcontroller / SoC] -- UART --> DBG[Debug console]
+  MCU -- I2C --> SENS[Sensors / EEPROM]
+  MCU -- SPI --> FLASH[External flash]
+  MCU -- JTAG/SWD --> PROG[Programmer / debugger]</pre><div class="diagram-caption">A single board often exposes several of these simultaneously — learning to spot them is the skill.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Ohm's law just enough to not fry a board</li><li>Bus signaling basics</li><li>Package types and finding test points</li><li>Multimeter and logic analyzer fundamentals</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>One formula you will use constantly at the bench: Ohm's law, <code>V = I × R</code>. It tells
+  you, for example, why probing the wrong pin with the wrong load can pull a voltage rail down enough to reset
+  the board — useful for understanding accidental faults, and later, intentional fault injection in Week 6.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: you find six unlabeled pads near a chip. A multimeter in continuity mode
+  shows one pad tied to ground and one held high at idle — classic power/ground pins. A logic analyzer on the
+  remaining four during boot shows one toggling rapidly (likely clock or data) and one idle-high with brief
+  activity right after power-on (a strong UART-TX candidate, since boot logs are common).</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">IDENTIFYING AN UNKNOWN HEADER (field checklist)
+1. Power off. Visually inspect for silkscreen labels (TX/RX/GND/VCC).
+2. Continuity-test each pin to known ground and known VCC.
+3. Power on, probe remaining pins with a logic analyzer at common bauds
+   (9600, 57600, 115200) looking for readable boot text on likely TX pins.
+4. Never apply a debugger's output pin to a line you haven't confirmed
+   is an input -- you can drive two outputs into contention and damage one.</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Unlabeled or unpopulated headers are one of the single most common ways a
+  supposedly "locked down" consumer device turns out to have a full UART root shell exposed on four solder pads.
+  Vendors frequently forget that unpopulated does not mean disabled.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Contract manufacturers often leave test points connected during mass production for
+  yield testing and QA, and the decision to physically remove or electrically disable them post-manufacturing is
+  a step that gets skipped under schedule pressure.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Hardware teardown research groups maintain public databases of debug-pad locations
+  for popular consumer devices precisely because this reconnaissance step is so consistently productive across
+  product lines from the same vendor.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A well-documented pattern across multiple consumer router and camera product lines: four
+  unpopulated pads near the main SoC turn out to be a UART console that drops directly to a root shell at boot,
+  with no password — because the debug console was never disabled for production, only left unpopulated with
+  header pins.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Unpopulated pads are disabled." — Unpopulated just means no header was soldered on; the electrical connection is often still live.</li><li>"If I don't see JTAG in the datasheet's default pinout, it's not there." — Many chips support debug pin muxing onto pins used for something else in normal operation.</li><li>"A multimeter alone is enough for bus identification." — Continuity and voltage get you started, but bus protocol identification generally needs a logic analyzer.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Ohm's law just enough to not fry a board</li><li>Bus signaling basics</li><li>Package types and finding test points</li><li>Multimeter and logic analyzer fundamentals</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>UART</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Universal Asynchronous Receiver/Transmitter — a simple two-wire serial interface, commonly used for debug consoles.</dd><dt><b>Test point</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An exposed pad or via on a PCB intended for manufacturing test or debug access.</dd><dt><b>Logic analyzer</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A tool that captures and decodes digital signals on multiple pins simultaneously, used to identify bus protocols.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is a key risk of connecting a 5V signal directly to a 3.3V logic microcontroller pin?</p><button class="quiz-opt" data-correct="false">Nothing, most chips are 5V tolerant by default</button><button class="quiz-opt" data-correct="true">Potential permanent damage to the microcontroller</button><button class="quiz-opt" data-correct="false">The connection will just be slower</button><button class="quiz-opt" data-correct="false">It will trigger a factory reset</button>
+        <div class="quiz-explain">Many microcontrollers are not 5V tolerant on their I/O pins; overvoltage can permanently damage the chip.</div></div>
+<div class="quiz-q"><p class="prompt">2. Why are unpopulated header pads a common security finding on consumer IoT devices?</p><button class="quiz-opt" data-correct="false">They are always intentionally left as a backdoor</button><button class="quiz-opt" data-correct="true">They often correspond to debug interfaces that were never electrically disabled for production</button><button class="quiz-opt" data-correct="false">They are decorative and carry no signal</button><button class="quiz-opt" data-correct="false">They are required by FCC certification</button>
+        <div class="quiz-explain">Unpopulated pads frequently correspond to UART, JTAG, or SWD debug interfaces that remain electrically live even though no header was soldered on.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>Bus Pirate and Saleae logic analyzer documentation</li><li>"The Hardware Hacker" by Andrew (bunnie) Huang — hardware reconnaissance chapters</li><li>JTAG/SWD standard reference documentation from ARM</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-00/embedded-linux-and-rtos-from-zero.html">
+          <span class="dir">← Previous</span>Embedded Linux & RTOS From Zero</a><a class="next" href="../../weeks/week-00/networking-from-zero-for-iot.html">
+          <span class="dir">Next →</span>Networking From Zero for IoT</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privilege, Services, Logs & Hardening on Embedded Linux/RTOS · IoT &amp; CPS Security</title>
+<meta name="description" content="Reduce a device's running services to its actual needs.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-02/privilege-services-logs-and-hardening-embedded" data-title="Privilege, Services, Logs & Hardening on Embedded Linux/RTOS" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-02/index.html">Week 02</a> / Privilege, Services, Logs & Hardening on Embedded Linux/RTOS</nav>
+<article class="article">
+  <span class="kicker">Week 02 · Lesson 5 · Core</span>
+  <h1>Privilege, Services, Logs & Hardening on Embedded Linux/RTOS</h1>
+  <p class="lede">Reduce a device's running services to its actual needs.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">This lesson closes Week 2's loop: once identity and access control are in place, the
+  remaining hardening work is about reducing what's running, limiting what each running thing can do, and
+  making sure evidence of what happened survives long enough to matter.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Reduce a device's running services to its actual needs.</li><li>Design logging that survives a device reboot or factory reset.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–1 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Service minimization</b>: every daemon running on a device is attack surface. A production
+  build should disable anything left over from development — debug shells, verbose diagnostic services,
+  unused network listeners.</p>
+  <p><b>Log persistence</b>: many embedded devices only keep logs in RAM or a small ring buffer that's wiped on
+  reboot — convenient for storage-constrained hardware, catastrophic for incident response, since an attacker
+  who can trigger a reboot can trivially destroy evidence. A hardening baseline should specify what must survive
+  a reboot (and ideally, a factory reset) versus what can be volatile.</p>
+  <p>A practical hardening checklist synthesizes this course's Week 2 material: minimal services, least-privilege
+  processes, verified identity, scoped authorization, and persistent-enough logging to support the incident
+  response work in Week 12.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  H[Hardening baseline] --> S[Service minimization]
+  H --> P[Least-privilege processes]
+  H --> L[Persistent logging]
+  H --> I[Verified device identity]
+  H --> A[Scoped authorization]</pre><div class="diagram-caption">Each branch maps to a lesson earlier this week — hardening is the synthesis, not new material.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Service minimization</li><li>Persistent vs. volatile logs on flash</li><li>Hardening checklists for embedded Linux</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, an attack-surface reduction metric worth tracking: count of running
+  services/listeners before and after a hardening pass. A meaningful hardening effort should show this number
+  drop substantially, not just add new controls on top of an unchanged baseline.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a device ships with telnet, an unauthenticated diagnostic HTTP server, and
+  SSH all running by default "just in case." A hardening pass disables telnet and the diagnostic server entirely
+  (neither is used in production), and restricts SSH to key-based auth with no default credentials — a concrete
+  reduction from three exposed services to one, properly authenticated.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">EMBEDDED HARDENING CHECKLIST
+[ ] List every running service/listener; justify each one's presence
+[ ] Disable/remove anything not required for production operation
+[ ] Verify no default or hardcoded credentials remain
+[ ] Confirm logs relevant to security events survive reboot
+    (not just RAM-only ring buffers)
+[ ] Confirm device identity is verified independently at each
+    trust boundary from Week 1's architecture lesson
+[ ] Confirm command interfaces are scoped per Lesson 2.4's audit method</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Service minimization is one of the highest-return, lowest-cost hardening activities
+  available: disabling something you don't need costs nothing in engineering effort and eliminates attack
+  surface outright, compared to adding new detection or authentication controls.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Security-conscious product teams increasingly build a documented, versioned
+  hardening baseline into their release checklist, rather than treating hardening as a one-time audit finding to
+  remediate — this closes the gap that let debug builds ship to production in the first place.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Firmware-analysis research tools that automatically diff a device's running-service
+  inventory against a documented baseline are an active area of tooling development, aiming to catch
+  hardening regressions between firmware releases automatically.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A recurring audit finding across many consumer router product lines: a diagnostic web server,
+  intended only for factory testing, ships enabled in production firmware with no authentication — exactly the
+  kind of unjustified running service a minimization pass would catch.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Hardening is a one-time task before launch." — Firmware updates can reintroduce services or credentials; hardening needs to be checked every release.</li><li>"RAM-only logs are fine because the device barely has storage anyway." — Even a small amount of persistent storage for security-relevant events pays off enormously during incident response.</li><li>"If a service isn't documented, it's not a risk." — Undocumented services are often the highest-risk finding precisely because no one is tracking or maintaining them.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Service minimization</li><li>Persistent vs. volatile logs on flash</li><li>Hardening checklists for embedded Linux</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Service minimization</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The practice of disabling or removing any running service not strictly required for a device's production function.</dd><dt><b>Hardening baseline</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A documented, versioned set of security configuration requirements applied consistently across a product's releases.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is RAM-only (non-persistent) logging a significant problem for embedded device security?</p><button class="quiz-opt" data-correct="false">RAM is too slow for logging</button><button class="quiz-opt" data-correct="true">An attacker who triggers a reboot can trivially destroy all evidence of an incident</button><button class="quiz-opt" data-correct="false">RAM-only logs use too much power</button><button class="quiz-opt" data-correct="false">It's not actually a problem</button>
+        <div class="quiz-explain">If logs don't survive a reboot, a simple reboot (which an attacker may be able to trigger) erases evidence needed for incident response and forensics.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>CIS Benchmarks (as a general hardening-methodology reference)</li><li>OWASP IoT Top 10 — insecure default settings and outdated components items</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-02/authorization-and-access-control-on-embedded-platforms.html">
+          <span class="dir">← Previous</span>Authorization & Access Control on Embedded Platforms</a><a class="next" href="../../weeks/week-03/cryptography-from-first-principles-constrained.html">
+          <span class="dir">Next →</span>Cryptography From First Principles on Resource-Constrained Hardware</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

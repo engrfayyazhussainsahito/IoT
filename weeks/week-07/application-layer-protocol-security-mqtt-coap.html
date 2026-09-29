@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Application-Layer Protocol Security (MQTT, CoAP, REST for devices) · IoT &amp; CPS Security</title>
+<meta name="description" content="Harden an MQTT broker against topic-hijacking and unauthorized publish.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-07/application-layer-protocol-security-mqtt-coap" data-title="Application-Layer Protocol Security (MQTT, CoAP, REST for devices)" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-07/index.html">Week 07</a> / Application-Layer Protocol Security (MQTT, CoAP, REST for devices)</nav>
+<article class="article">
+  <span class="kicker">Week 07 · Lesson 5 · Core</span>
+  <h1>Application-Layer Protocol Security (MQTT, CoAP, REST for devices)</h1>
+  <p class="lede">Harden an MQTT broker against topic-hijacking and unauthorized publish.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 7 closes where most IoT data actually flows: the application-layer protocols
+  carrying telemetry and commands between devices, gateways, and cloud platforms. Getting the access-control
+  model right here is often more impactful than any lower-layer protocol choice.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Harden an MQTT broker against topic-hijacking and unauthorized publish.</li><li>Compare CoAP/DTLS with MQTT/TLS for a constrained deployment.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–6 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>MQTT</b> uses a publish-subscribe model built around topics — a hierarchical string like
+  <code>building/floor3/room12/temperature</code>. Security hinges entirely on <b>topic-level ACLs
+  (Access Control Lists)</b>: without them, any authenticated client can often publish to or subscribe to any
+  topic, including ones belonging to other devices or tenants — a classic multi-tenant isolation failure.</p>
+  <p><b>CoAP</b> (Constrained Application Protocol) is REST-like but designed for constrained devices and UDP
+  transport, typically paired with DTLS (Week 3) for security — its RESTful design maps naturally onto
+  resource-oriented device APIs (GET /sensor/temperature).</p>
+  <p><b>REST/webhook security for device callbacks</b>: when a cloud platform calls back to a device or a
+  third-party service (a webhook), that callback endpoint needs its own authentication — a surprisingly common
+  gap is a webhook receiver trusting any request that "looks like" it came from the expected source, based only
+  on network origin rather than a verified signature or token.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  D1[Device: building/floor3/room12] -->|publish only, own topic| BROKER[MQTT broker]
+  D1 -.blocked: cannot publish.-> T2[building/floor3/room14/temperature]
+  APP[Monitoring app] -->|subscribe, read-only, all topics under building/*| BROKER</pre><div class="diagram-caption">Without per-topic ACLs, any authenticated device can typically publish to or read any other device's topic.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>MQTT ACLs and topic design</li><li>CoAP + DTLS patterns</li><li>REST/webhook security for device callbacks</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a least-privilege topic design principle: a device should generally be
+  granted publish rights only to its own topic namespace, and subscribe rights only where its function genuinely
+  requires reading other devices' data — not broad wildcard access "for convenience" during development that
+  never gets tightened before production.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: an MQTT broker configured without topic ACLs allows any authenticated
+  device to publish to <code>building/+/+/lock/command</code> (a wildcard subscription/publish pattern) —
+  meaning any single compromised device credential can send unlock commands to every door lock in the building,
+  not just its own. Proper per-device ACLs scoped to each device's own topic prevent this entirely.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">MQTT ACL CONFIGURATION EXAMPLE (Mosquitto-style syntax, illustrative)
+# Device can only publish to its own topic namespace
+user device_room12
+topic write building/floor3/room12/#
+
+# Monitoring app can read (but not write) across the building
+user monitoring_app
+topic read building/#
+
+# Without ACLs like these, any authenticated client can typically
+# publish/subscribe to ANY topic -- a common, serious misconfiguration.</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Missing topic-level ACLs are one of the most common, highest-impact IoT
+  misconfigurations found in real assessments — the underlying transport may be perfectly encrypted via TLS
+  while the authorization model above it is effectively absent, a classic case of confusing "encrypted" with
+  "access-controlled."</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Managed MQTT/IoT platform services increasingly enforce per-device topic scoping by
+  default (tying a device's credential directly to its permitted topic namespace), reducing the chance of this
+  misconfiguration compared to a self-hosted broker configured manually.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Internet-wide scans of publicly exposed MQTT brokers have repeatedly found large
+  numbers with no authentication or ACLs at all, exposing live telemetry and, in some cases, control channels for
+  real devices — an ongoing, measurable research finding rather than a one-time historical issue.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Multiple documented smart-building and smart-home platform vulnerabilities have stemmed
+  directly from missing or overly permissive MQTT topic ACLs, allowing cross-device or cross-tenant access that
+  the platform's designers had not intended or tested for.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"If MQTT traffic is encrypted with TLS, it's secure." — Encryption protects data in transit; it says nothing about whether topic-level authorization is properly configured.</li><li>"CoAP doesn't need the same access-control attention as MQTT since it's more like a simple API." — CoAP resources need the same authorization rigor as any REST-style API; the protocol's simplicity doesn't grant automatic security.</li><li>"Webhook callbacks are safe if they come from a known IP address." — Network origin alone is spoofable or otherwise insufficient; callbacks should be authenticated via signatures or tokens, not just source IP.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>MQTT ACLs and topic design</li><li>CoAP + DTLS patterns</li><li>REST/webhook security for device callbacks</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>MQTT topic ACL</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An access control rule restricting which MQTT topics a specific client may publish to or subscribe from.</dd><dt><b>CoAP</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Constrained Application Protocol — a lightweight, REST-like protocol designed for constrained devices, typically secured with DTLS.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is the primary risk of an MQTT broker with no topic-level ACLs configured?</p><button class="quiz-opt" data-correct="false">Messages will not be encrypted</button><button class="quiz-opt" data-correct="true">Any authenticated client may be able to publish or subscribe to any topic, including ones belonging to other devices or tenants</button><button class="quiz-opt" data-correct="false">The broker will run out of memory</button><button class="quiz-opt" data-correct="false">MQTT cannot function without ACLs</button>
+        <div class="quiz-explain">Without topic-level ACLs, MQTT's default behavior often permits any authenticated client broad access across topics, breaking the isolation between different devices' or tenants' data and commands.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>MQTT 5.0 specification — security considerations section</li><li>RFC 7252: The Constrained Application Protocol (CoAP)</li><li>Research on internet-wide exposed MQTT broker scans</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-07/gateways-vpns-secure-network-design-iot.html">
+          <span class="dir">← Previous</span>Gateways, VPNs & Secure Network Design for IoT Deployments</a><a class="next" href="../../weeks/week-08/midterm-practical-iot-attack-surface-and-defense-review.html">
+          <span class="dir">Next →</span>Midterm Practical: IoT Attack Surface & Defense Review</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

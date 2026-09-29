@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Network Segmentation & Zero Trust for IoT/OT Networks · IoT &amp; CPS Security</title>
+<meta name="description" content="Design VLAN/segment boundaries for a mixed IT/IoT/OT network.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-07/network-segmentation-zero-trust-iot-ot" data-title="Network Segmentation & Zero Trust for IoT/OT Networks" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-07/index.html">Week 07</a> / Network Segmentation & Zero Trust for IoT/OT Networks</nav>
+<article class="article">
+  <span class="kicker">Week 07 · Lesson 3 · Core</span>
+  <h1>Network Segmentation & Zero Trust for IoT/OT Networks</h1>
+  <p class="lede">Design VLAN/segment boundaries for a mixed IT/IoT/OT network.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">If a device can't run a traditional security agent, can't be patched promptly, and
+  might have unknown vulnerabilities baked in from manufacturing, the network around it has to carry more of the
+  security burden than it would for a modern laptop. Segmentation and zero-trust design are how that burden gets
+  distributed.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Design VLAN/segment boundaries for a mixed IT/IoT/OT network.</li><li>Apply zero-trust principles to devices that can't run an agent.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–6 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>IoT VLANs and micro-segmentation</b>: placing IoT/OT devices on network segments isolated
+  from corporate IT traffic limits the blast radius if any single device is compromised — a compromised smart
+  thermostat shouldn't have a network path to a finance department's file server.</p>
+  <p><b>Agentless zero trust</b> adapts zero-trust principles (verify explicitly, least privilege, assume breach)
+  to devices that can't run a software agent: verification happens at the network layer instead — via switch
+  port authentication (802.1X), network access control (NAC) fingerprinting device behavior, or a gateway that
+  mediates every connection on the device's behalf.</p>
+  <p><b>East-west traffic control</b> — restricting device-to-device communication within a segment, not just
+  segment-to-segment — matters because many IoT compromises spread laterally between devices on the same
+  "trusted" network segment once one device is breached, exactly the pattern Mirai-class botnets (Week 9)
+  exploit.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  CORP[Corporate IT VLAN] -.blocked by default.-> IOT[IoT VLAN]
+  IOT --> D1[Device A]
+  IOT --> D2[Device B]
+  IOT --> D3[Device C]
+  D1 -.east-west blocked\nby default.-> D2
+  D1 -.east-west blocked\nby default.-> D3
+  GW[Gateway/firewall] -->|mediates all traffic| IOT</pre><div class="diagram-caption">Segment-to-segment AND device-to-device traffic both need explicit allow rules, not implicit trust.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>IoT VLANs and micro-segmentation</li><li>Agentless zero trust for constrained devices</li><li>East-west traffic control</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a lateral-movement risk estimate: in a flat network with N devices and no
+  east-west restriction, a single compromised device has a direct network path to N-1 others. With
+  device-to-device isolation and only gateway-mediated communication, that same compromise has a direct path to
+  effectively zero peer devices.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a building's IoT VLAN allows all devices to communicate freely with each
+  other by default (a common misconfiguration). One compromised camera can now directly scan and attempt
+  exploitation against every other device on that VLAN. Adding device-to-device isolation, with only
+  gateway-mediated traffic permitted, reduces this to a single compromised device with no direct lateral path.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">SEGMENTATION AUDIT CHECKLIST
+[ ] IoT/OT devices are on VLANs separate from corporate IT traffic
+[ ] Default-deny rules exist between IoT VLAN and corporate VLAN,
+    with only specific, justified exceptions allowed
+[ ] Device-to-device (east-west) traffic within the IoT VLAN is
+    restricted by default, not implicitly trusted
+[ ] Devices that can't run an agent are verified via network-layer
+    mechanisms (802.1X, NAC fingerprinting) rather than left unverified
+[ ] Gateway mediates and logs cross-segment traffic for visibility</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Network segmentation is one of the most effective compensating controls available
+  for a device fleet that inherently can't be fully trusted individually — it doesn't fix any given device's
+  vulnerabilities, but it dramatically limits what a successful compromise can reach next.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Building-management and industrial-network vendors increasingly ship segmentation
+  as a default-on configuration recommendation rather than an advanced/optional setting, reflecting how
+  consistently flat-network designs have contributed to real incidents.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Zero-trust architecture research (NIST SP 800-207) explicitly addresses agentless
+  and legacy-device scenarios, providing a formal framework for exactly the network-layer verification approach
+  this lesson describes.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Numerous documented building-automation and industrial incidents follow the same pattern:
+  initial compromise of one internet-facing or poorly secured device, followed by unrestricted lateral movement
+  across a flat network to reach higher-value targets — a pattern segmentation specifically breaks.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Putting IoT devices on a separate VLAN is sufficient on its own." — Without east-west restriction within that VLAN, lateral movement between IoT devices themselves remains possible.</li><li>"Zero trust requires every device to run an agent." — Agentless approaches using network-layer verification are a core, well-established part of zero-trust architecture for exactly this reason.</li><li>"Segmentation is a one-time network setup task." — Segmentation policies need ongoing review as new devices and use cases are added to a network.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>IoT VLANs and micro-segmentation</li><li>Agentless zero trust for constrained devices</li><li>East-west traffic control</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Micro-segmentation</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Fine-grained network segmentation restricting traffic even between devices within the same broader network zone.</dd><dt><b>East-west traffic</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Network traffic between devices within the same segment or tier, as opposed to north-south traffic between tiers.</dd><dt><b>NAC</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Network Access Control — systems that verify and control device access to a network, often via fingerprinting or authentication at the network layer.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is 'east-west' (device-to-device) traffic control important in addition to VLAN segmentation from corporate IT?</p><button class="quiz-opt" data-correct="false">It has no additional benefit beyond VLAN separation</button><button class="quiz-opt" data-correct="true">Without it, a single compromised device on the IoT VLAN can directly reach and attack every other device on that same VLAN</button><button class="quiz-opt" data-correct="false">It only matters for wireless devices</button><button class="quiz-opt" data-correct="false">It replaces the need for VLAN segmentation entirely</button>
+        <div class="quiz-explain">VLAN segmentation alone limits IoT-to-corporate traffic, but without east-west restriction, devices within the IoT segment can still freely attack each other if one is compromised.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-207: Zero Trust Architecture</li><li>Purdue model references (previewed here, covered fully in Week 15) for industrial network segmentation</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-07/rf-sdr-traffic-analysis-detection.html">
+          <span class="dir">← Previous</span>RF & SDR-Based Traffic Analysis and Detection</a><a class="next" href="../../weeks/week-07/gateways-vpns-secure-network-design-iot.html">
+          <span class="dir">Next →</span>Gateways, VPNs & Secure Network Design for IoT Deployments</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

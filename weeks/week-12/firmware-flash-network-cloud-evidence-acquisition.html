@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firmware, Flash Memory, Network & Cloud Evidence Acquisition · IoT &amp; CPS Security</title>
+<meta name="description" content="Extract firmware images from flash for offline analysis.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-12/firmware-flash-network-cloud-evidence-acquisition" data-title="Firmware, Flash Memory, Network & Cloud Evidence Acquisition" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-12/index.html">Week 12</a> / Firmware, Flash Memory, Network & Cloud Evidence Acquisition</nav>
+<article class="article">
+  <span class="kicker">Week 12 · Lesson 3 · Core</span>
+  <h1>Firmware, Flash Memory, Network & Cloud Evidence Acquisition</h1>
+  <p class="lede">Extract firmware images from flash for offline analysis.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">A single device tells only part of the story. This lesson is about pulling a complete
+  timeline together from three very different evidence sources — firmware/flash, network captures, and cloud
+  logs — that rarely arrive in the same format, timezone, or level of detail.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Extract firmware images from flash for offline analysis.</li><li>Correlate device-side evidence with cloud and network logs.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–11 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Flash dumping approaches</b>, building on the previous lesson: common methods include reading
+  via an exposed programming interface (SPI, JTAG — Week 6 territory), using a dedicated flash programmer after
+  desoldering (destructive), or, when available, extracting an image via a legitimate vendor recovery/debug
+  mode.</p>
+  <p><b>Correlating device + cloud + network timelines</b> is often the single hardest practical step: device
+  clocks frequently drift or reset (especially after a compromise or reboot), cloud logs use their own
+  authoritative timestamps, and network captures record wall-clock capture time — reconciling these into one
+  coherent timeline requires identifying reliable anchor events (a known cloud-side transaction time, for example)
+  to calibrate device-local timestamps against.</p>
+  <p><b>Read-only acquisition practices</b>: wherever possible, acquisition tooling and procedures should
+  guarantee they cannot modify the source evidence — write-blockers for storage media, read-only mount options,
+  and documented tool behavior — the same principle from traditional digital forensics, applied across all three
+  evidence sources.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  FW[Firmware/flash evidence\ndevice-local clock, may drift] --> ANCHOR[Anchor event:\nknown cloud transaction]
+  NET[Network capture\nwall-clock capture time] --> ANCHOR
+  CLOUD[Cloud logs\nauthoritative cloud timestamp] --> ANCHOR
+  ANCHOR --> TIMELINE[Unified incident timeline]</pre><div class="diagram-caption">An anchor event ties three independently-clocked sources into one trustworthy sequence.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Flash dumping approaches</li><li>Correlating device + cloud + network timelines</li><li>Read-only acquisition practices</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a clock-drift estimation exercise: compare a device's internal timestamp
+  for a known event (say, a specific cloud-acknowledged telemetry upload) against that same event's cloud-side
+  timestamp, calculate the offset, and apply that offset consistently across the rest of that device's local
+  timestamps for the incident timeline — rather than trusting device-local time at face value.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a device's flash log shows a suspicious configuration change at
+  "device time 14:02:17," but the device's clock is known to be running roughly 6 minutes fast based on a
+  cross-check against a cloud-acknowledged event nearby in the log. The corrected timestamp (~13:56) is what
+  actually gets used when correlating this event against network capture and cloud log data for the same window.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">MULTI-SOURCE EVIDENCE TIMELINE WORKSHEET
+Evidence source        | Native timestamp | Known drift/offset | Corrected timestamp
+------------------------------------------------------------------------------------
+Device flash log        | ________          | ________             | ________
+Network capture           | ________          | ________ (usually 0) | ________
+Cloud logs                 | ________          | ________ (usually 0,\n treated as authoritative) | ________
+Anchor event used for calibration: ________________________________</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>An incident timeline built without explicit clock-drift correction can produce a
+  confidently wrong narrative — events that appear to happen in one order based on raw timestamps may actually
+  have occurred in a different order once drift is accounted for, potentially changing conclusions about root
+  cause or attacker sequence of actions.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Mature incident response teams working with device fleets often build tooling that
+  automatically applies known clock-drift corrections for common device models, rather than requiring an analyst
+  to manually work out drift for every investigation from scratch.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Digital forensics research into multi-source timeline reconciliation continues to
+  develop more automated, statistically robust methods for identifying anchor events and estimating drift, since
+  manual reconciliation doesn't scale well to fleet-wide, multi-device incidents.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Documented forensic investigations have reached incorrect initial conclusions about attack
+  sequence due to uncorrected device clock drift, later revised once cross-referencing against cloud-side
+  authoritative timestamps revealed the true event order — a cautionary pattern this lesson's worksheet is
+  designed to prevent.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Device-local timestamps can be trusted at face value for building an incident timeline." — Device clocks frequently drift, especially after a compromise, reboot, or power loss, and should be calibrated against a reliable anchor event.</li><li>"Any acquisition tool is fine as long as it gets the data." — Read-only, write-blocked acquisition practices matter for preserving evidentiary integrity, whether for legal proceedings or simply trustworthy internal investigation.</li><li>"Network, device, and cloud evidence naturally line up without extra work." — Reconciling independently-clocked, differently-formatted sources into one coherent timeline is a distinct, often difficult analytical step.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Flash dumping approaches</li><li>Correlating device + cloud + network timelines</li><li>Read-only acquisition practices</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Clock drift</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The gradual divergence of a device's internal clock from accurate/reference time.</dd><dt><b>Anchor event</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A known event with a reliable timestamp used to calibrate and correct timestamps across multiple evidence sources.</dd><dt><b>Write-blocker</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A tool or method ensuring that an acquisition process cannot modify the original evidence source.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is identifying an 'anchor event' important when correlating device, network, and cloud evidence?</p><button class="quiz-opt" data-correct="false">It's a legal requirement in all jurisdictions</button><button class="quiz-opt" data-correct="true">It provides a reliable reference point to calibrate and correct for clock drift between independently-timestamped evidence sources</button><button class="quiz-opt" data-correct="false">It eliminates the need to examine network capture data</button><button class="quiz-opt" data-correct="false">Anchor events are only relevant for cloud-only investigations</button>
+        <div class="quiz-explain">An anchor event with a known, reliable timestamp lets an investigator calculate and correct for drift in other evidence sources' timestamps, producing an accurate unified timeline rather than a potentially misleading one based on raw, uncorrected timestamps.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-86: Guide to Integrating Forensic Techniques into Incident Response</li><li>Digital forensics research on multi-source timeline reconciliation methods</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-12/evidence-preservation-forensics-embedded-devices.html">
+          <span class="dir">← Previous</span>Evidence Preservation & Digital Forensics for Embedded Devices</a><a class="next" href="../../weeks/week-12/containment-eradication-recovery-runbooks-iot-ot.html">
+          <span class="dir">Next →</span>Containment, Eradication & Recovery Runbooks for IoT/OT</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

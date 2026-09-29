@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence Preservation & Digital Forensics for Embedded Devices · IoT &amp; CPS Security</title>
+<meta name="description" content="Preserve volatile and flash-based evidence from a compromised device.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-12/evidence-preservation-forensics-embedded-devices" data-title="Evidence Preservation & Digital Forensics for Embedded Devices" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-12/index.html">Week 12</a> / Evidence Preservation & Digital Forensics for Embedded Devices</nav>
+<article class="article">
+  <span class="kicker">Week 12 · Lesson 2 · Core</span>
+  <h1>Evidence Preservation & Digital Forensics for Embedded Devices</h1>
+  <p class="lede">Preserve volatile and flash-based evidence from a compromised device.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Forensic evidence on a laptop mostly means disk images and memory dumps. On an
+  embedded device, "evidence" can mean a flash chip you have thirty seconds to read before a watchdog timer
+  reboots the device and destroys your only chance at volatile data — physical constraints forensics on servers
+  simply doesn't face.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Preserve volatile and flash-based evidence from a compromised device.</li><li>Maintain chain of custody for physically seized hardware.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–11 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Volatile vs. flash evidence</b>: RAM contents (running process state, decrypted keys held only
+  in memory, network buffers) vanish on power loss or reboot — often faster and more completely on embedded
+  targets than on servers, since many embedded devices have far less RAM and simpler power states. Flash-based
+  evidence (firmware, logs, configuration) persists but can be intentionally or accidentally wiped by continued
+  device operation, a factory reset, or an attacker's own anti-forensic actions.</p>
+  <p><b>Chain of custody for physically seized hardware</b> follows standard forensic principles (documented,
+  unbroken record of who had custody of the evidence and when) but with embedded-specific wrinkles: a device that
+  must remain powered to preserve volatile evidence needs a documented, continuous power-maintenance
+  chain, not just a sealed evidence bag in a shelf.</p>
+  <p><b>Non-destructive vs. destructive acquisition</b>: reading a flash chip in-circuit (without desoldering) is
+  non-destructive and preserves the option for later re-analysis; desoldering a chip for direct programmer access
+  can yield more complete or reliable data but destroys the option to return the device to working condition —
+  a trade-off decision that should be made deliberately, not by default.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  A[Suspected compromised device] --> B{Volatile evidence\nof interest?}
+  B -->|Yes| C[Preserve power immediately,\ndocument continuous custody]
+  B -->|No/unknown| D{Flash acquisition method}
+  D --> E[Non-destructive:\nin-circuit read]
+  D --> F[Destructive:\ndesolder + direct read]
+  E -.preserves device.-> G[Option for re-analysis retained]
+  F -.higher fidelity,\nirreversible.-> H[Device unusable afterward]</pre><div class="diagram-caption">Every branch trades completeness of evidence against preservation of future options.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Volatile vs. flash evidence</li><li>Chain of custody for physical hardware</li><li>Non-destructive vs. destructive acquisition</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a time-pressure framing: unlike server forensics, embedded volatile-evidence
+  preservation often operates on a countdown (battery life, watchdog timers, an attacker's own anti-forensic
+  timers) — responders need a pre-planned, rehearsed acquisition procedure ready to execute immediately, since
+  there's frequently no time to design one on the spot.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a suspected-compromised battery-powered sensor is seized in the field. Its
+  battery has an estimated 20 minutes of remaining charge. The response team prioritizes acquiring volatile
+  memory state via an available debug interface within that window, accepting a less complete flash-level
+  acquisition later, rather than risking losing the volatile evidence entirely while deciding on an acquisition
+  strategy.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">EMBEDDED EVIDENCE ACQUISITION CHECKLIST
+[ ] Assess time pressure: battery life, watchdog behavior, any known
+    anti-forensic timers before deciding acquisition order
+[ ] If volatile evidence is a priority: maintain power, document
+    continuous custody of that power source explicitly
+[ ] Choose non-destructive (in-circuit) acquisition first when
+    device re-use or later re-analysis matters
+[ ] Document EVERY acquisition step with timestamps -- courts and
+    internal reviews alike will ask what was done and when
+[ ] Photograph physical state (board, connections) before any
+    destructive step, since it cannot be undone</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Embedded forensics rewards pre-planning far more than server forensics does — the
+  physical and time constraints mean an improvised acquisition strategy decided during the incident itself is
+  much more likely to lose critical volatile evidence than a rehearsed, pre-defined procedure.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Organizations with meaningful embedded/IoT fleets increasingly maintain
+  pre-approved, tested acquisition procedures and even dedicated hardware (battery packs to maintain power during
+  transport, for example) specifically to remove acquisition-strategy decisions from the time-pressured moment of
+  an actual incident.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Embedded and IoT forensics research continues to develop standardized acquisition
+  methodologies for an increasingly diverse range of chip packages and flash types, since no single tool or
+  technique covers the full range of hardware a responder might encounter.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Documented embedded-device investigations have lost key volatile evidence due to a device's
+  battery depleting or a watchdog-triggered reboot occurring before an acquisition plan was finalized —
+  reinforcing why this lesson emphasizes rehearsed, ready-to-execute procedures over improvisation.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Embedded forensic evidence behaves like a server's — it will still be there when you're ready to look." — Volatile evidence on embedded devices can vanish far faster due to smaller RAM, simpler power states, and watchdog timers.</li><li>"Non-destructive acquisition is always the right choice." — It's often preferable, but a deliberate destructive approach can be justified when maximum evidence fidelity outweighs preserving the device.</li><li>"Chain of custody for hardware just means keeping it in a sealed bag." — If volatile evidence preservation requires continuous power, custody documentation must reflect that continuous power-maintenance chain.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Volatile vs. flash evidence</li><li>Chain of custody for physical hardware</li><li>Non-destructive vs. destructive acquisition</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Volatile evidence</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Data that exists only while a device is powered and running, such as RAM contents, lost on power-off or reboot.</dd><dt><b>Non-destructive acquisition</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A forensic data-extraction method that does not permanently alter or disable the device being examined.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why might embedded device forensics require faster, more time-pressured decision-making than typical server forensics?</p><button class="quiz-opt" data-correct="false">Embedded devices are always physically larger</button><button class="quiz-opt" data-correct="true">Smaller RAM, simpler power states, and watchdog timers can cause volatile evidence to be lost much faster than on a typical server</button><button class="quiz-opt" data-correct="false">Embedded devices never contain any evidence worth preserving</button><button class="quiz-opt" data-correct="false">There is no meaningful time pressure difference</button>
+        <div class="quiz-explain">Embedded devices often have much less RAM, simpler power management, and watchdog timers that can trigger reboots, all of which can destroy volatile evidence far more quickly than on a typical server.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>SWGDE (Scientific Working Group on Digital Evidence) best practices for embedded device forensics</li><li>NIST SP 800-101: Guidelines on Mobile Device Forensics (adaptable principles)</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-12/ir-first-principles-cyber-physical-incidents.html">
+          <span class="dir">← Previous</span>IR From First Principles for Cyber-Physical Incidents</a><a class="next" href="../../weeks/week-12/firmware-flash-network-cloud-evidence-acquisition.html">
+          <span class="dir">Next →</span>Firmware, Flash Memory, Network & Cloud Evidence Acquisition</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

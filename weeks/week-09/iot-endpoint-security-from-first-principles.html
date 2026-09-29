@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IoT/Embedded Endpoint Security From First Principles · IoT &amp; CPS Security</title>
+<meta name="description" content="Define what 'endpoint security' means when there's no traditional AV agent.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-09/iot-endpoint-security-from-first-principles" data-title="IoT/Embedded Endpoint Security From First Principles" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-09/index.html">Week 09</a> / IoT/Embedded Endpoint Security From First Principles</nav>
+<article class="article">
+  <span class="kicker">Week 09 · Lesson 1 · Core</span>
+  <h1>IoT/Embedded Endpoint Security From First Principles</h1>
+  <p class="lede">Define what 'endpoint security' means when there's no traditional AV agent.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">"Endpoint security" on a laptop means an agent watching processes, files, and
+  network calls in real time. Most IoT devices can't run that agent — too little RAM, no spare CPU cycles, often
+  no OS abstraction to hook into. This lesson asks what endpoint security even means once that assumption is
+  gone.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Define what 'endpoint security' means when there's no traditional AV agent.</li><li>Map endpoint controls to a device's actual compute budget.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–8 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Rather than a single heavyweight agent, constrained-device endpoint security is built from
+  several lighter-weight, complementary pieces:</p>
+  <ul>
+    <li><b>Minimal telemetry footprints</b> — a small, carefully chosen set of signals (boot count, uptime,
+    firmware version, a handful of security-relevant counters) that fit a device's tiny transmission budget
+    (Week 0's duty-cycle constraints) while still supporting meaningful detection.</li>
+    <li><b>Device health attestation</b> — a device periodically reports a cryptographically verifiable
+    statement of its own state (firmware hash, secure-boot status) rather than raw behavioral telemetry, letting
+    a backend detect drift from an expected-good state without needing to interpret complex logs.</li>
+    <li><b>Network-based compensating detection</b> — pushing detection logic to the gateway or network layer
+    (Week 7's segmentation and monitoring material) for devices too constrained to detect anything about
+    themselves.</li>
+  </ul>
+  <p>The unifying principle: endpoint security for constrained devices is an architecture decision distributed
+  across device, gateway, and cloud tiers, not a single product you install.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  DEV[Device: minimal telemetry\n+ attestation] --> GW[Gateway: network-based\ndetection, aggregation]
+  GW --> CLOUD[Cloud: correlation,\nfleet-wide anomaly detection]
+  CLOUD -.compensates for.-> DEV</pre><div class="diagram-caption">Each tier compensates for what the constrained device tier cannot do itself.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Endpoint security without a full agent</li><li>Minimal telemetry footprints</li><li>Device health attestation</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a telemetry-budget allocation exercise: given a device's total daily
+  transmission budget (Week 0's duty-cycle math), decide what fraction is spent on functional data (sensor
+  readings) versus security telemetry (attestation, counters). A common mistake is allocating zero budget to
+  security telemetry by default, only adding it reactively after an incident.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a battery sensor with a tiny daily transmission budget adds a single extra
+  byte to its normal payload representing a rolling hash of its own firmware version and boot count. A backend
+  comparing this against the expected value for that device's fleet cohort can detect an unexpected firmware
+  change or excessive reboot rate — meaningful detection capability added for a near-zero telemetry cost.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">MINIMAL TELEMETRY DESIGN WORKSHEET
+Device's total available transmission budget: ________ bytes/period
+Functional payload size: ________ bytes
+Remaining budget for security telemetry: ________ bytes
+Candidate security signals (pick highest-value for the budget):
+[ ] Firmware version/hash
+[ ] Boot/reboot count
+[ ] Secure boot status flag
+[ ] Simple anomaly counter (e.g., failed auth attempts)</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>The most common failure in constrained-device "endpoint security" isn't a missing
+  agent — it's zero thought given to what minimal signal set would still support detection, because the team
+  assumed full agent-based security was either required or impossible, with no middle ground considered.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Cloud IoT device-management platforms increasingly build in attestation and
+  minimal-telemetry patterns as standard features, reducing the design burden on individual product teams to
+  invent this from scratch for every new device line.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Research into remote attestation for extremely constrained devices (with even less
+  compute than a typical Cortex-M microcontroller) continues to push the boundary of what's feasible on the very
+  cheapest hardware tiers.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Fleet operators who added even minimal firmware-version telemetry after initially shipping
+  with none have repeatedly found this simple signal alone sufficient to detect anomalous fleet subsets during
+  later incidents — illustrating how much value even a small, well-chosen telemetry investment provides.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"A device too constrained for a full agent has no endpoint security options at all." — Minimal telemetry, attestation, and network-based compensating controls all remain viable.</li><li>"Endpoint security only matters for devices with an OS." — Even the simplest bare-metal device benefits from some minimal telemetry or attestation signal.</li><li>"More telemetry is always better regardless of budget." — Telemetry that exceeds a device's power/duty-cycle budget can itself become an availability or battery-life problem.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Endpoint security without a full agent</li><li>Minimal telemetry footprints</li><li>Device health attestation</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Device health attestation</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A cryptographically verifiable report of a device's current state, such as firmware version or secure-boot status.</dd><dt><b>Minimal telemetry footprint</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A small, carefully selected set of security-relevant signals designed to fit within a constrained device's power/bandwidth budget.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is 'device health attestation' in the context of constrained-device endpoint security?</p><button class="quiz-opt" data-correct="false">Running a full antivirus scan on the device</button><button class="quiz-opt" data-correct="true">A device periodically reporting a cryptographically verifiable statement of its own state, such as firmware hash or secure-boot status</button><button class="quiz-opt" data-correct="false">Encrypting all telemetry data</button><button class="quiz-opt" data-correct="false">Physically inspecting the device on a schedule</button>
+        <div class="quiz-explain">Attestation lets a device report a verifiable summary of its own state, allowing a backend to detect drift from an expected-good configuration without needing full behavioral telemetry.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-155: BIOS Integrity Measurement Guidelines (attestation concepts, broader context)</li><li>TCG (Trusted Computing Group) remote attestation architecture documentation</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-08/midterm-practical-iot-attack-surface-and-defense-review.html">
+          <span class="dir">← Previous</span>Midterm Practical: IoT Attack Surface & Defense Review</a><a class="next" href="../../weeks/week-09/device-hardening-patch-management-fleet-scale.html">
+          <span class="dir">Next →</span>Device Hardening & Patch/Update Management at Fleet Scale</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

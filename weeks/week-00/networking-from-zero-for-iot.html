@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Networking From Zero for IoT · IoT &amp; CPS Security</title>
+<meta name="description" content="Compare enterprise IP networking with constrained PAN/LPWAN topologies.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-00/networking-from-zero-for-iot" data-title="Networking From Zero for IoT" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-00/index.html">Week 00</a> / Networking From Zero for IoT</nav>
+<article class="article">
+  <span class="kicker">Week 00 · Lesson 4 · Foundations</span>
+  <h1>Networking From Zero for IoT</h1>
+  <p class="lede">Compare enterprise IP networking with constrained PAN/LPWAN topologies.</p>
+  <div class="meta-row">
+    <span><b>40 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">If your networking intuition comes from enterprise IT, it will mislead you here.
+  Enterprise networking optimizes for throughput and manageability with effectively unlimited power. IoT
+  networking optimizes for years of battery life and kilometers of range on milliwatts — and every security
+  property downstream of that trade-off looks different as a result.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Compare enterprise IP networking with constrained PAN/LPWAN topologies.</li><li>Explain why IoT networking optimizes for power and range over throughput.</li><li>Place a device correctly in a star, mesh, or hub-and-spoke topology.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>No prior lessons required — this is the course's starting point.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Three topology families cover most IoT deployments:</p>
+  <ul>
+    <li><b>Star</b> — every device talks directly to a central hub or gateway (common in Zigbee coordinator
+    setups, most Wi-Fi based devices).</li>
+    <li><b>Mesh</b> — devices relay traffic for each other, extending range at the cost of more complex routing
+    and a larger attack surface for routing-layer attacks (Zigbee mesh, Thread).</li>
+    <li><b>Hub-and-spoke via LPWAN</b> — long-range, low-power wide-area networks (LoRaWAN, NB-IoT) where
+    devices talk long distances directly to a base station, trading bandwidth for range and battery life.</li>
+  </ul>
+  <p>Underneath topology, almost every LPWAN and many mesh protocols use <b>duty cycling</b>: a device budgets
+  how many seconds per hour it's allowed to transmit, both for battery life and, in unlicensed spectrum, for
+  regulatory compliance. This single constraint explains a huge amount of IoT protocol design — including
+  why security handshakes are often deliberately minimized.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  subgraph Star
+  H1((Hub)) --- D1[Device]
+  H1 --- D2[Device]
+  H1 --- D3[Device]
+  end
+  subgraph Mesh
+  M1[Device] --- M2[Device]
+  M2 --- M3[Device]
+  M1 --- M3
+  end
+  subgraph LPWAN Hub-and-Spoke
+  B((Base station)) -.long range.- L1[Device]
+  B -.long range.- L2[Device]
+  end</pre><div class="diagram-caption">Topology choice trades off range, power, and resilience — and shapes the attack surface.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>PAN vs. LAN vs. LPWAN vs. WAN</li><li>Star, mesh, and hybrid topologies</li><li>Duty cycling and airtime budgets</li><li>Gateways as protocol translators</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>Duty cycle budgets are simple but consequential: a device limited to a 1% duty cycle can
+  transmit for only 36 seconds per hour. That budget has to cover sensor data <em>and</em> any security overhead
+  — retransmissions, key renegotiation, or extra authentication rounds all compete for the same 36 seconds.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a LoRaWAN soil-moisture sensor wakes once per hour, sends an 11-byte
+  payload, and sleeps. If a security control added a full TLS-style handshake on every wake cycle, it could
+  single-handedly consume the device's entire duty-cycle and power budget — which is exactly why LoRaWAN uses a
+  lightweight join procedure instead (covered in Week 7).</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">ROUGH DUTY-CYCLE BUDGET (EU868, 1% sub-band)
+Available airtime per hour:      36 seconds
+Typical uplink (11-byte payload): ~50 ms
+Security overhead if naive TLS handshake reused every wake: 1-3 seconds
+--> naive handshake reuse could consume 3-8% of the ENTIRE hourly budget
+    for one wake cycle, explaining why join-once/rejoin-rarely designs win.</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Power and airtime budgets are why so many IoT protocols choose "authenticate once,
+  trust the session for a long time" designs — which is efficient, but means a compromised session key can
+  remain valid far longer than a typical web session token would.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Network operators deploying LPWAN at city scale plan spectrum and duty-cycle budgets
+  the way cloud teams plan compute capacity — it's a first-class constraint in the architecture, not an
+  afterthought, and security features must be costed against it explicitly.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>A recurring research theme is designing authentication and key-rotation schemes
+  that fit inside these tiny power and airtime budgets without falling back to "authenticate once, forever" —
+  this is still an active area, not a solved problem.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Several LPWAN sensor-network compromises have traced back to long-lived session keys that were
+  never rotated because rotation was considered "too expensive" for the duty-cycle budget — illustrating the
+  real tension between power efficiency and cryptographic hygiene that this lesson introduces.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"IoT networking is just Wi-Fi with less range." — Most IoT protocols make fundamentally different power/range/bandwidth trade-offs than Wi-Fi.</li><li>"Mesh networks are always more secure because there's no single point of failure." — Mesh adds routing-layer attack surface (route poisoning, relay abuse) that star topologies don't have.</li><li>"Duty cycle limits are just a regulatory nuisance." — They actively shape which security designs are even feasible on a device's power budget.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>PAN vs. LAN vs. LPWAN vs. WAN</li><li>Star, mesh, and hybrid topologies</li><li>Duty cycling and airtime budgets</li><li>Gateways as protocol translators</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>LPWAN</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Low-Power Wide-Area Network — long-range, low-bandwidth radio designed for battery-powered sensors (e.g., LoRaWAN, NB-IoT).</dd><dt><b>Duty cycle</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The fraction of time a device is permitted or able to transmit, often regulatory or power-driven.</dd><dt><b>Gateway</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A device that bridges a constrained IoT network to IP-based networks, often performing protocol translation.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why might an IoT protocol avoid a full handshake on every message?</p><button class="quiz-opt" data-correct="false">Handshakes are illegal in unlicensed spectrum</button><button class="quiz-opt" data-correct="true">It would consume a disproportionate share of a tiny power/duty-cycle budget</button><button class="quiz-opt" data-correct="false">Handshakes are not supported by any radio hardware</button><button class="quiz-opt" data-correct="false">It has nothing to do with power or airtime</button>
+        <div class="quiz-explain">Duty-cycle and battery budgets are so tight on many IoT devices that repeating an expensive handshake every message could consume most of the available airtime.</div></div>
+<div class="quiz-q"><p class="prompt">2. What new attack surface does a mesh topology introduce compared to a star topology?</p><button class="quiz-opt" data-correct="false">None, mesh is strictly more secure</button><button class="quiz-opt" data-correct="true">Routing-layer attacks such as route poisoning or malicious relaying</button><button class="quiz-opt" data-correct="false">Higher power consumption only</button><button class="quiz-opt" data-correct="false">Incompatibility with encryption</button>
+        <div class="quiz-explain">Because mesh devices relay traffic for each other, a compromised or malicious node can manipulate routing in ways a star topology's central hub design avoids.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>LoRa Alliance LoRaWAN specification (architecture chapters)</li><li>Thread Group networking architecture overview</li><li>ETSI regulations on duty cycling in the 868/915 MHz ISM bands</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-00/electronics-and-hardware-fundamentals.html">
+          <span class="dir">← Previous</span>Electronics & Hardware Fundamentals for Security Learners</a><a class="next" href="../../weeks/week-00/python-and-embedded-scripting-for-iot-security.html">
+          <span class="dir">Next →</span>Python & Embedded Scripting for IoT Security</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zero Trust at Scale & Identity-Centric Architecture for IoT/OT · IoT &amp; CPS Security</title>
+<meta name="description" content="Extend zero-trust architecture patterns to agentless OT assets.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-15/zero-trust-at-scale-identity-centric-iot-ot" data-title="Zero Trust at Scale & Identity-Centric Architecture for IoT/OT" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-15/index.html">Week 15</a> / Zero Trust at Scale & Identity-Centric Architecture for IoT/OT</nav>
+<article class="article">
+  <span class="kicker">Week 15 · Lesson 2 · Advanced</span>
+  <h1>Zero Trust at Scale & Identity-Centric Architecture for IoT/OT</h1>
+  <p class="lede">Extend zero-trust architecture patterns to agentless OT assets.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 7 introduced agentless zero trust for individual IoT segments. This lesson scales
+  that same idea across an entire mixed IT/OT estate — an environment where "verify explicitly, assume breach"
+  has to work for everything from a modern cloud workload to a decades-old PLC that will never run any agent at
+  all.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Extend zero-trust architecture patterns to agentless OT assets.</li><li>Design identity-centric segmentation for a mixed IT/OT estate.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–14 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Zero trust for agentless assets</b> at scale means every enforcement decision has to happen
+  at a point other than the asset itself — a network policy enforcement point, a broker/gateway (Week 7), or an
+  identity-aware proxy — since a huge fraction of OT assets, by design or by age, will never run a zero-trust
+  agent.</p>
+  <p><b>Identity-centric segmentation</b> shifts the segmentation logic from "which network is this device on"
+  (Week 7's VLAN-based approach) to "what identity does this device or communication present, and is that
+  identity authorized for this specific action" — a more granular, more portable model, particularly valuable
+  as OT/IT boundaries blur through cloud integration and remote access needs.</p>
+  <p><b>Policy enforcement points (PEPs)</b> in an OT network need to be placed deliberately at the Purdue model's
+  conduits (previous lesson), since that's where identity-based policy decisions can actually be enforced without
+  requiring every Level 0/1 asset to participate directly in the zero-trust architecture.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  IDENTITY[Identity provider] --> PEP1[Policy enforcement point\nat IT/OT conduit]
+  PEP1 --> OT[Legacy OT assets\n(no agent possible)]
+  IDENTITY --> PEP2[Policy enforcement point\nat cloud gateway]
+  PEP2 --> CLOUD[Cloud workloads]
+  PEP1 -.same identity model.-> PEP2</pre><div class="diagram-caption">A single identity-centric model spans both agent-capable and agentless assets via well-placed enforcement points.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Zero trust for agentless assets</li><li>Identity-centric segmentation</li><li>Policy enforcement points in OT networks</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a PEP-coverage exercise: for every Purdue-model conduit in your
+  architecture (previous lesson's audit), confirm a policy enforcement point actually exists there. A conduit
+  without a PEP is a zero-trust architecture gap, regardless of how well other parts of the estate are covered.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a remote engineer needs occasional access to a Level 2 SCADA server for
+  maintenance. Rather than granting broad, standing VPN access to the entire OT network segment (Week 7's coarser
+  model), an identity-centric approach grants a time-boxed, identity-verified session scoped specifically to that
+  one server, through a policy enforcement point that logs and can immediately revoke the access — without
+  requiring any agent on the SCADA server itself.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">IDENTITY-CENTRIC OT ACCESS REQUEST TEMPLATE
+Requestor identity: ________________________________
+Specific asset(s) requested (not "the OT network"): __________________
+Justification: ________________________________
+Time-boxed access window: ________________________________
+Policy enforcement point logging this session: ________________________
+Access automatically revoked at window end? [ ] Yes [ ] No</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Identity-centric segmentation's real advantage over pure network segmentation is
+  granularity and auditability — a security review can answer "who accessed this specific asset and why" far
+  more precisely than "what could theoretically reach this VLAN," which matters enormously during incident
+  investigation (Week 12).</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>OT security vendors increasingly offer identity-aware access brokers specifically
+  designed to sit at IT/OT conduits, providing zero-trust-style access control for legacy assets that will never
+  support a native agent — a maturing product category responding directly to this architectural need.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>NIST's zero-trust architecture guidance (SP 800-207, referenced in Week 7)
+  explicitly addresses legacy and agentless asset scenarios, providing a formal basis for the enforcement-point
+  placement strategy this lesson describes, rather than leaving it as an ad hoc industry practice.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Organizations that have implemented identity-centric access brokering for OT maintenance
+  access have reported significantly improved audit trails and faster incident scoping compared to prior broad,
+  standing VPN access models — directly validating the granularity benefit this lesson emphasizes.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Zero trust requires every asset to run an agent." — Agentless assets can be covered through well-placed policy enforcement points at network conduits.</li><li>"Identity-centric segmentation replaces the need for Purdue model network segmentation." — It builds on and adds granularity to network segmentation, typically enforced at the same conduit points.</li><li>"Broad, standing remote access is acceptable if the user's identity was verified once at login." — Identity-centric zero trust favors time-boxed, scoped access with continuous verification, not one-time login granting broad standing access.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Zero trust for agentless assets</li><li>Identity-centric segmentation</li><li>Policy enforcement points in OT networks</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Policy enforcement point (PEP)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A network location where access control decisions based on identity and policy are actually enforced.</dd><dt><b>Identity-centric segmentation</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A security model that controls access based on verified identity and authorization rather than solely on network location.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. How can zero-trust principles be applied to legacy OT assets that cannot run a security agent?</p><button class="quiz-opt" data-correct="false">It's impossible; zero trust cannot apply to agentless assets</button><button class="quiz-opt" data-correct="true">Enforcement can happen at a policy enforcement point positioned at network conduits, rather than requiring the asset itself to participate directly</button><button class="quiz-opt" data-correct="false">The asset must be replaced before any zero-trust policy can apply</button><button class="quiz-opt" data-correct="false">Agentless assets are automatically exempt from zero-trust architecture</button>
+        <div class="quiz-explain">Zero-trust enforcement can be shifted to a policy enforcement point at a network conduit or gateway, allowing identity-based access control even for assets that will never run a native agent.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-207: Zero Trust Architecture (legacy/agentless asset guidance)</li><li>Industrial zero-trust access broker vendor documentation</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-15/ot-ics-scada-security-deep-dive.html">
+          <span class="dir">← Previous</span>OT/ICS/SCADA Security Deep Dive (Purdue model, PLCs, Modbus/DNP3/OPC-UA)</a><a class="next" href="../../weeks/week-15/post-quantum-crypto-agility-constrained-devices.html">
+          <span class="dir">Next →</span>Post-Quantum Cryptography & Crypto Agility for Constrained Devices</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

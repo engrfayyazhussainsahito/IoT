@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IoT Cloud Security From First Principles (provisioning, digital twins) · IoT &amp; CPS Security</title>
+<meta name="description" content="Explain the security role of a device shadow/digital twin.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-10/iot-cloud-security-from-first-principles" data-title="IoT Cloud Security From First Principles (provisioning, digital twins)" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-10/index.html">Week 10</a> / IoT Cloud Security From First Principles (provisioning, digital twins)</nav>
+<article class="article">
+  <span class="kicker">Week 10 · Lesson 1 · Core</span>
+  <h1>IoT Cloud Security From First Principles (provisioning, digital twins)</h1>
+  <p class="lede">Explain the security role of a device shadow/digital twin.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 1 introduced the digital twin/device shadow concept as part of the reference
+  architecture. Here we treat the cloud tier as a first-class security subject in its own right — starting with
+  the moment a device first proves its identity to the cloud, and the surprisingly risky window that surrounds
+  it.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Explain the security role of a device shadow/digital twin.</li><li>Identify risks introduced by bulk device-provisioning workflows.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–9 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Device shadows/digital twins</b>, revisited: the cloud-side representation lets applications
+  and business logic interact with "the device" even when it's briefly offline — but this means the shadow itself
+  becomes a target. If an attacker can manipulate a device's shadow state without compromising the device
+  directly, they may be able to influence what commands get queued for delivery once the device reconnects.</p>
+  <p><b>Bulk provisioning</b> — enrolling thousands of devices into a cloud platform at manufacturing time —
+  typically uses a shared "bootstrap" credential to get each device its own unique, permanent identity during
+  first boot. This bootstrap credential is a high-value target: if extracted, it may allow an attacker to enroll
+  fraudulent devices as if they were legitimate members of the fleet.</p>
+  <p><b>Cloud-side device registries</b> are the authoritative record of "which devices exist and what state they
+  should be in" — their integrity underpins nearly every other cloud-side control, from IAM scoping (next lesson)
+  to fleet-wide patch tracking (Week 9).</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  MFG[Manufacturing] -->|bootstrap credential| ENROLL[Cloud enrollment]
+  ENROLL --> REG[Device registry]
+  REG --> SHADOW[Device shadow/twin]
+  ATT[Attacker with leaked\nbootstrap credential] -.fraudulent enrollment.-> ENROLL
+  ATT2[Attacker with shadow\nwrite access] -.manipulate queued commands.-> SHADOW</pre><div class="diagram-caption">Two distinct attack surfaces: the enrollment credential, and the shadow's write path.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Device shadows/digital twins</li><li>Bulk provisioning and bootstrap credentials</li><li>Cloud-side device registries</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a bootstrap-credential exposure estimate: if a single shared bootstrap
+  credential is used to provision an entire fleet, its compromise doesn't just affect one device — it
+  potentially allows fraudulent enrollment of arbitrarily many new "devices" impersonating legitimate fleet
+  members, a much larger blast radius than any single device compromise.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a device's shadow includes a "desired state" field that a mobile app can
+  write to queue a command (say, "unlock: true") for delivery next time the device connects. If the cloud
+  platform doesn't independently verify that only an authorized user can write to a specific device's shadow,
+  an attacker with access to the shadow API — even without ever touching the device itself — can queue
+  unauthorized commands.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">CLOUD PROVISIONING AND SHADOW SECURITY AUDIT
+[ ] Bootstrap/enrollment credentials are unique per manufacturing
+    batch (or per device), not one single shared secret for the
+    entire product line
+[ ] Bootstrap credentials expire or are single-use where possible
+[ ] Shadow/twin write access is scoped per-device, verified against
+    the authenticated caller's actual ownership/authorization
+[ ] Device registry changes are logged and auditable</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Cloud-side attack surface for IoT is frequently under-scrutinized compared to
+  device-side firmware security, despite often being the higher-leverage target — a single cloud
+  misconfiguration can affect an entire fleet simultaneously, unlike most device-level bugs.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Major cloud IoT platforms have progressively tightened default shadow/twin
+  write-access scoping in response to exactly this class of finding, but self-hosted or custom-built IoT
+  backends often still require this scoping to be implemented carefully by the product team.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Security research into cloud IoT platform architectures continues to find shadow/twin
+  manipulation and provisioning-credential weaknesses as recurring vulnerability classes across different
+  vendors' implementations, suggesting this remains a systemic design challenge rather than a solved problem.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Documented cloud IoT platform vulnerabilities have included cases where a user's mobile app
+  access to their own device's shadow could, due to insufficient scoping, be manipulated to affect other users'
+  devices — a direct real-world instance of the shadow write-access risk described in this lesson.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"The cloud side is inherently more secure than device firmware." — Cloud misconfigurations can have larger blast radius than individual device bugs, and are just as real an attack surface.</li><li>"A shared bootstrap credential for provisioning is fine if it's kept secret." — Its compromise affects the entire fleet's enrollment integrity, not just one device — per-device or per-batch credentials substantially reduce this risk.</li><li>"Device shadows are just a caching convenience with no security implications." — Shadow write access is a genuine control surface that can influence real device behavior.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Device shadows/digital twins</li><li>Bulk provisioning and bootstrap credentials</li><li>Cloud-side device registries</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Bootstrap credential</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A shared or initial credential used to enroll a device into a cloud platform during first-time provisioning.</dd><dt><b>Device registry</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The authoritative cloud-side record of which devices exist in a fleet and their expected state.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is a shared bootstrap/enrollment credential used across an entire product line a significant security risk?</p><button class="quiz-opt" data-correct="false">It slows down manufacturing</button><button class="quiz-opt" data-correct="true">Its compromise could allow fraudulent enrollment of arbitrarily many devices impersonating legitimate fleet members</button><button class="quiz-opt" data-correct="false">It has no meaningful risk if kept on a private network</button><button class="quiz-opt" data-correct="false">It only affects a single device if leaked</button>
+        <div class="quiz-explain">A single shared bootstrap credential compromise has fleet-wide blast radius, potentially enabling fraudulent device enrollment at scale rather than affecting just one unit.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>AWS IoT Device Provisioning and Azure IoT Hub Device Provisioning Service documentation</li><li>Cloud Security Alliance IoT security guidance</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-09/ransomware-availability-attack-readiness-iot-ot.html">
+          <span class="dir">← Previous</span>Ransomware & Availability-Attack Readiness for IoT/OT</a><a class="next" href="../../weeks/week-10/cloud-iam-identity-governance-device-fleets.html">
+          <span class="dir">Next →</span>Cloud IAM & Identity Governance for Device Fleets</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Input Validation & Parsing Untrusted Sensor/Network Data · IoT &amp; CPS Security</title>
+<meta name="description" content="Validate sensor and protocol input defensively on constrained parsers.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-04/input-validation-untrusted-sensor-network-data" data-title="Input Validation & Parsing Untrusted Sensor/Network Data" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-04/index.html">Week 04</a> / Input Validation & Parsing Untrusted Sensor/Network Data</nav>
+<article class="article">
+  <span class="kicker">Week 04 · Lesson 3 · Core</span>
+  <h1>Input Validation & Parsing Untrusted Sensor/Network Data</h1>
+  <p class="lede">Validate sensor and protocol input defensively on constrained parsers.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Every parser is a promise: "I will only accept well-formed input, and I will fail
+  safely on anything else." On constrained firmware, that promise is broken more often than anywhere else in
+  this course's material — and the consequences of a broken parser are frequently a full compromise, not just a
+  crash.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Validate sensor and protocol input defensively on constrained parsers.</li><li>Explain why parser bugs are disproportionately dangerous in firmware.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–3 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Untrusted input on an IoT device arrives from more places than web developers typically
+  consider: not just network protocol messages, but sensor readings (which an attacker can sometimes manipulate
+  physically or via RF spoofing), and even firmware update payloads before their signature is verified.</p>
+  <p>Constrained parsers are disproportionately dangerous because they're often written by hand in C, optimized
+  for a tiny memory footprint, with bounds checks sometimes omitted "for performance" on a hot code path — a
+  trade-off that looks reasonable in isolation and catastrophic once an attacker finds the unvalidated boundary.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  DEV[Device] --> P1[Network protocol parser]
+  DEV --> P2[Sensor data parser]
+  DEV --> P3[Firmware update parser\n(pre-signature-check stage)]
+  P1 --> R[Risk: remote attacker]
+  P2 --> R2[Risk: physical/RF spoofing]
+  P3 --> R3[Risk: supply-chain or MITM]</pre><div class="diagram-caption">Every one of these boundaries needs independent bounds/format validation.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Untrusted parser hardening</li><li>Length/bounds checks on tiny buffers</li><li>Fuzzable parser boundaries</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a bounds-check coverage exercise: for every buffer that receives external
+  data, confirm the maximum possible input size is checked against the buffer's actual allocated size <em>before</em>
+  any copy occurs, not after.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a firmware update parser reads a length field from the update header and
+  uses it directly to size a memory copy, without checking it against the actual buffer allocated to hold the
+  update. A maliciously crafted header with an oversized length field triggers a classic buffer overflow — before
+  the update's cryptographic signature is even checked, meaning this parser bug is reachable by anyone who can
+  get bytes to the device, not just someone with a valid signing key.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-c">// Unsafe: length field trusted without bounds checking
+void parse_update_header(uint8_t *data, size_t len) {
+    uint32_t payload_len = read_u32(data);      // attacker-controlled
+    memcpy(update_buf, data + 4, payload_len);  // no check vs sizeof(update_buf)!
+}
+
+// Safer: validate before copying
+void parse_update_header(uint8_t *data, size_t len) {
+    uint32_t payload_len = read_u32(data);
+    if (payload_len > sizeof(update_buf) || len < 4 + payload_len) {
+        reject_update();
+        return;
+    }
+    memcpy(update_buf, data + 4, payload_len);
+}</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Parser bugs are disproportionately dangerous in firmware because there's often no
+  memory-safe runtime, no ASLR, and no process isolation to limit the blast radius of a single overflow — a bug
+  that would crash one process on a desktop OS can compromise the entire device here.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Fuzzing untrusted parsers (covered fully in Week 5) has become a standard
+  pre-release step for security-conscious firmware teams specifically because manual review of hand-written C
+  parsers reliably misses edge cases that automated testing catches quickly.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Memory-safe language adoption for embedded parsing code (Rust, in particular) is
+  an active area of both research and industry migration, driven directly by this class of vulnerability's
+  persistence in C-based firmware.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A significant share of publicly disclosed firmware CVEs trace back to exactly this pattern:
+  an attacker-controlled length or offset field trusted without validation, leading to a buffer overflow in a
+  network, sensor, or update parser.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Only network-facing parsers need input validation." — Sensor data and pre-verification update payloads are also untrusted input surfaces.</li><li>"Signature verification makes update-parsing bugs irrelevant." — A parser bug reachable before signature verification is exploitable regardless of whether the attacker has a valid signing key.</li><li>"Skipping bounds checks for performance is a reasonable trade-off on a hot path." — The performance gain is rarely worth the risk of a full-device compromise from a single overflow.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Untrusted parser hardening</li><li>Length/bounds checks on tiny buffers</li><li>Fuzzable parser boundaries</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Untrusted input</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Any data originating outside a trust boundary that must be validated before use.</dd><dt><b>Buffer overflow</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A bug where data written to a buffer exceeds its allocated size, corrupting adjacent memory.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why can a bug in a firmware update parser be dangerous even before the update's cryptographic signature is checked?</p><button class="quiz-opt" data-correct="false">Signature checks happen before parsing always, so this isn't possible</button><button class="quiz-opt" data-correct="true">If the parser processes attacker-controlled fields (like a length) before verifying the signature, the bug is reachable by anyone who can deliver bytes to the device, not just a valid signer</button><button class="quiz-opt" data-correct="false">Signatures are never used on firmware updates</button><button class="quiz-opt" data-correct="false">Parser bugs can only occur after signature verification</button>
+        <div class="quiz-explain">If any parsing of untrusted fields happens before the signature check, that code path is reachable by any attacker who can deliver data to the device, regardless of whether they hold a valid signing key.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>CERT C Coding Standard — input validation rules</li><li>CWE-120: Buffer Copy without Checking Size of Input</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-04/requirements-abuse-cases-secure-design-iot.html">
+          <span class="dir">← Previous</span>Requirements, Abuse Cases & Secure Design for IoT Products</a><a class="next" href="../../weeks/week-04/secrets-dependencies-sboms-firmware.html">
+          <span class="dir">Next →</span>Secrets, Dependencies & SBOMs for Firmware</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

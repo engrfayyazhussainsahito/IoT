@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fleet-Scale IoT Security Assessment & Risk Register · IoT &amp; CPS Security</title>
+<meta name="description" content="Produce a fleet-scale risk register from an assessment.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-16/fleet-scale-iot-security-assessment-risk-register" data-title="Fleet-Scale IoT Security Assessment & Risk Register" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-16/index.html">Week 16</a> / Fleet-Scale IoT Security Assessment & Risk Register</nav>
+<article class="article">
+  <span class="kicker">Week 16 · Lesson 2 · Capstone</span>
+  <h1>Fleet-Scale IoT Security Assessment & Risk Register</h1>
+  <p class="lede">Produce a fleet-scale risk register from an assessment.</p>
+  <div class="meta-row">
+    <span><b>45 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">This is the capstone's first working deliverable: taking everything from the Week 8
+  midterm's single-deployment assessment method and scaling it to a full fictional fleet, producing the
+  portfolio-level risk register Week 14 taught you to build.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Produce a fleet-scale risk register from an assessment.</li><li>Prioritize findings using safety-aware risk scoring.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–15 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>The fleet assessment methodology combines, in sequence: Week 1's trust-boundary architecture
+  mapping, Week 13's reconnaissance-and-validation approach (applied here to the capstone's provided artifacts,
+  not live testing), and Week 14's risk-tiered register structure — scaled from the midterm's single deployment
+  to a fictional multi-site, multi-product-line fleet.</p>
+  <p>The <b>risk register structure</b> should let a reader compare findings across very different asset types
+  (a consumer sensor line versus an industrial actuator line) on a common, safety-aware scale (Week 1's
+  Likelihood × [Digital Impact + Safety Impact] formula), exactly as Week 14's portfolio risk management lesson
+  described.</p>
+  <p><b>Safety-aware prioritization</b> means the final deliverable's ranking should visibly reflect physical
+  consequence, not just technical severity — a lower-CVSS finding on a safety-relevant actuator should
+  plausibly outrank a higher-CVSS finding on a pure-telemetry sensor, if the underlying scoring is done correctly.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  A[Fleet architecture packet] --> B[Trust-boundary map\n-- Week 1 method]
+  B --> C[Attack-surface findings\n-- Week 13 method]
+  C --> D[Safety-aware scoring\n-- Week 1 formula]
+  D --> E[Portfolio risk register\n-- Week 14 structure]</pre><div class="diagram-caption">Every stage reuses a named method from earlier in the course — this lesson is integration at fleet scale.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Fleet assessment methodology</li><li>Risk register structure</li><li>Safety-aware prioritization</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>Reuse Week 1's formula exactly: <code>Risk = Likelihood (1-5) × [Digital Impact (1-5) + Safety
+  Impact (0-5)]</code>, applied consistently across every finding regardless of which product line it came from
+  — consistency across asset types is what makes a portfolio-level register genuinely comparable, per Week 14.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Deliverable format: a risk register (spreadsheet or structured document) with one row per
+  finding, columns for asset/product line, finding description, likelihood, digital impact, safety impact,
+  computed risk score, and recommended remediation — sorted by risk score, with a short narrative explaining any
+  cases where a lower-score finding was still flagged for expedited attention due to qualitative factors the
+  formula doesn't fully capture.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">FLEET RISK REGISTER ROW TEMPLATE
+Product line / asset: ________________________________
+Finding: ________________________________
+Likelihood (1-5): ___  Digital impact (1-5): ___  Safety impact (0-5): ___
+Risk score (L x [D+S]): ___
+Recommended remediation: ________________________________
+Remediation priority tier (per Week 14's risk-tiered model): ______</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>This deliverable is graded on the same criteria as the Week 8 midterm, scaled up:
+  correct trust-boundary identification, consistent safety-aware scoring application, and defensible
+  prioritization — not on raw finding count or technical sophistication of any single finding.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>This mirrors exactly how a real security consultancy or internal security team would
+  structure a portfolio-wide risk assessment deliverable for executive and engineering stakeholders
+  simultaneously, per Week 14's governance-reporting material.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>No new research content here — the goal is disciplined application of prior weeks'
+  frameworks at scale, the same integration principle the Week 8 midterm established for a single deployment.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Past cohorts' most common capstone deduction at this stage: inconsistent scoring methodology
+  applied across different product lines (using CVSS for one, an ad hoc scale for another), breaking the
+  portfolio-level comparability that's the entire point of a unified risk register.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Different product lines can reasonably use different risk-scoring scales." — Consistent scoring is essential for a portfolio register to support genuine cross-product prioritization.</li><li>"More findings documented automatically means a stronger deliverable." — Consistent, defensible scoring and prioritization matter more than raw finding count.</li><li>"This lesson requires new technical skills beyond what the course has already covered." — It's explicitly an integration exercise combining Weeks 1, 13, and 14's existing methods at larger scale.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Fleet assessment methodology</li><li>Risk register structure</li><li>Safety-aware prioritization</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Fleet-scale assessment</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A security assessment methodology applied across an entire portfolio of products or deployments, rather than a single asset.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is scoring consistency across different product lines essential for a fleet-scale risk register?</p><button class="quiz-opt" data-correct="false">It isn't actually important as long as each product line's findings are internally consistent</button><button class="quiz-opt" data-correct="true">Inconsistent scoring breaks the portfolio-level comparability that allows leadership to prioritize across the entire fleet, which is the register's core purpose</button><button class="quiz-opt" data-correct="false">Consistency only matters for regulatory compliance, not practical prioritization</button><button class="quiz-opt" data-correct="false">Each product line should be assessed completely independently with no cross-comparison</button>
+        <div class="quiz-explain">A portfolio risk register's value comes from enabling comparison and prioritization across different assets; inconsistent scoring methodology across product lines undermines that core purpose.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>Review Week 1 (risk formula), Week 13 (assessment methodology), and Week 14 (risk register structure) material directly for this deliverable</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-16/capstone-scenario-charter-success-criteria.html">
+          <span class="dir">← Previous</span>Capstone Scenario Charter & Success Criteria</a><a class="next" href="../../weeks/week-16/detection-ir-forensic-evidence-drill-iot.html">
+          <span class="dir">Next →</span>Detection/IR/Forensic Evidence Drill for an IoT Incident</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memory, C & Unsafe Code From First Principles on Microcontrollers · IoT &amp; CPS Security</title>
+<meta name="description" content="Explain memory layout differences between hosted and bare-metal C programs.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-05/memory-c-unsafe-code-microcontrollers" data-title="Memory, C & Unsafe Code From First Principles on Microcontrollers" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-05/index.html">Week 05</a> / Memory, C & Unsafe Code From First Principles on Microcontrollers</nav>
+<article class="article">
+  <span class="kicker">Week 05 · Lesson 1 · Advanced</span>
+  <h1>Memory, C & Unsafe Code From First Principles on Microcontrollers</h1>
+  <p class="lede">Explain memory layout differences between hosted and bare-metal C programs.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">C on a microcontroller looks like C anywhere else, but the ground underneath it is
+  different: no operating system to catch a wild pointer, often no memory protection at all, and undefined
+  behavior that can manifest as a subtly wrong sensor reading instead of a clean crash.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Explain memory layout differences between hosted and bare-metal C programs.</li><li>Identify undefined behavior patterns common in firmware.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–4 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>A bare-metal C program's memory layout is defined by a <b>linker script</b>: it dictates exactly
+  where code, initialized data, zero-initialized data, stack, and heap (if used at all) live in the chip's
+  address space. Unlike a hosted OS, there's typically no virtual memory — these are real physical addresses,
+  and overlap or misconfiguration in the linker script is itself a potential vulnerability.</p>
+  <p><b>Undefined behavior (UB)</b> in C — signed integer overflow, use of uninitialized variables, out-of-bounds
+  access — is dangerous everywhere, but especially so in embedded contexts where compilers aggressively optimize
+  for tiny code size and may make assumptions based on UB that produce surprising, security-relevant behavior
+  changes between compiler versions or optimization levels.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  A[Flash: .text - code] --> B[Flash: .rodata - constants]
+  B --> C[RAM: .data - initialized globals]
+  C --> D[RAM: .bss - zero-init globals]
+  D --> E[RAM: heap - grows up, if used]
+  E --> F[RAM: stack - grows down]
+  style F fill:#f2e3d3,stroke:#b5560f</pre><div class="diagram-caption">Stack and heap (if present) growing toward each other is the classic bare-metal collision risk.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Bare-metal memory map</li><li>Linker scripts and sections</li><li>UB patterns in embedded C</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a memory-map sanity check: sum the linker script's declared sizes for
+  .data, .bss, heap, and maximum expected stack usage. If that sum exceeds the chip's actual RAM, you have a
+  latent overflow condition that may only manifest under specific runtime conditions (deep call stacks, heap
+  fragmentation) rather than immediately at boot.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a signed integer used to represent a sensor delta accidentally overflows
+  under specific input conditions. Because signed integer overflow is undefined behavior in C, the compiler is
+  free to assume it never happens — and may optimize away a bounds check that was intended to catch exactly this
+  case, silently removing the safety net the developer thought they had written.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-c">// This bounds check can be silently optimized away by the compiler,
+// because signed overflow is undefined behavior and the compiler may
+// assume 'x + 10' never overflows when reasoning about this branch.
+int check_range(int x) {
+    if (x + 10 < x) {       // intended overflow check -- UB makes this unreliable
+        return -1;
+    }
+    return x + 10;
+}
+
+// Safer: check using unsigned arithmetic or explicit overflow-safe patterns
+int check_range_safe(int x) {
+    if (x > INT_MAX - 10) {  // no UB triggered in the check itself
+        return -1;
+    }
+    return x + 10;
+}</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Undefined behavior is uniquely dangerous because it isn't a bug in the traditional
+  sense — the compiler isn't wrong, the standard genuinely permits any behavior once UB is triggered, including
+  silently removing a security check the developer believed was protecting them.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>MISRA C, an industry coding standard widely used in automotive and industrial
+  embedded development, exists largely to restrict C to a subset that avoids the most dangerous undefined-behavior
+  patterns — adopting it (or a similar restricted subset) is a common industry mitigation.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Compiler research into UB-detection tooling (UBSan and similar sanitizers, covered
+  further in Lesson 5.5) has made this class of bug substantially easier to find during development than it was
+  a decade ago, though adoption in embedded toolchains still lags behind server/desktop tooling.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Multiple documented firmware bugs have traced back to compiler optimizations removing an
+  intended safety check that relied on undefined behavior — the code "looked correct" to a human reviewer while
+  being formally unreliable per the C standard.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"If code compiles without warnings, it doesn't have undefined behavior." — Many UB patterns compile silently, especially at default warning levels.</li><li>"Undefined behavior just means 'implementation-defined, but consistent.'" — Undefined behavior can differ between compiler versions, optimization levels, or even be optimized away entirely.</li><li>"This only matters for very complex code." — Simple-looking overflow checks are among the most common places UB silently defeats a developer's intent.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Bare-metal memory map</li><li>Linker scripts and sections</li><li>UB patterns in embedded C</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Linker script</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A file specifying how code and data sections are laid out in a target's memory address space.</dd><dt><b>Undefined behavior (UB)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Program behavior for which the C standard imposes no requirements, permitting any outcome including compiler optimization that removes intended logic.</dd><dt><b>MISRA C</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An industry coding standard restricting C to a safer subset, widely used in automotive and industrial embedded development.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why can a compiler legally remove a bounds check that relies on signed integer overflow behavior?</p><button class="quiz-opt" data-correct="false">Compilers are buggy</button><button class="quiz-opt" data-correct="true">Signed integer overflow is undefined behavior in C, so the compiler may assume it never occurs and optimize accordingly</button><button class="quiz-opt" data-correct="false">The check was written with a syntax error</button><button class="quiz-opt" data-correct="false">This can never actually happen</button>
+        <div class="quiz-explain">Because signed overflow is UB, the C standard permits the compiler to assume it doesn't happen, which can lead to removal of checks written to detect that exact overflow.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>MISRA C:2012 guideline overview</li><li>"A Guide to Undefined Behavior in C and C++" (community reference series)</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-04/firmware-cicd-and-secure-ota.html">
+          <span class="dir">← Previous</span>Firmware CI/CD & Secure OTA Update Integrity</a><a class="next" href="../../weeks/week-05/stack-heap-process-memory-bare-metal.html">
+          <span class="dir">Next →</span>Stack/Heap/Process Memory on Bare-Metal & RTOS Targets</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

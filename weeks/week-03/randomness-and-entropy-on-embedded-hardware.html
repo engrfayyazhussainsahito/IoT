@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Randomness & Entropy on Embedded Hardware · IoT &amp; CPS Security</title>
+<meta name="description" content="Identify weak or absent TRNG sources on cheap microcontrollers.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-03/randomness-and-entropy-on-embedded-hardware" data-title="Randomness & Entropy on Embedded Hardware" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-03/index.html">Week 03</a> / Randomness & Entropy on Embedded Hardware</nav>
+<article class="article">
+  <span class="kicker">Week 03 · Lesson 4 · Core</span>
+  <h1>Randomness & Entropy on Embedded Hardware</h1>
+  <p class="lede">Identify weak or absent TRNG sources on cheap microcontrollers.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Every cryptographic guarantee in this course rests on an assumption that keys are
+  unpredictable. On embedded hardware, that assumption is far shakier than most engineers realize — cheap
+  microcontrollers frequently lack a genuine hardware random-number source entirely.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Identify weak or absent TRNG sources on cheap microcontrollers.</li><li>Explain historical randomness failures that broke device identity.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–2 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>A <b>True Random Number Generator (TRNG)</b> harvests physical entropy (thermal noise, jitter
+  between independent oscillators) and, done correctly, produces genuinely unpredictable output. A
+  <b>Pseudo-Random Number Generator (PRNG)</b> deterministically expands a seed into a longer stream that looks
+  random but is fully determined by that seed — if the seed is guessable, so is everything the PRNG produces.</p>
+  <p>The most dangerous failure mode is <b>boot-time entropy starvation</b>: a device that needs random numbers
+  very early in boot (for example, to generate a session key immediately after powering on) may not yet have
+  accumulated enough environmental noise to seed a PRNG safely, especially if it lacks a hardware TRNG and relies
+  on software entropy sources like timing jitter that need time to accumulate.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  A[Power on] --> B[Entropy pool: empty/low]
+  B -->|milliseconds-seconds| C[Entropy pool: sufficient]
+  A -.risk: key generated here.-> B
+  C -.safe: key generated here.-> D[Secure key material]
+  style B fill:#f7e6df,stroke:#9c4221
+  style C fill:#e3efe6,stroke:#2f6b46</pre><div class="diagram-caption">Generating keys before the entropy pool is sufficiently seeded is a recurring, serious bug class.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>TRNG vs. PRNG on embedded chips</li><li>Boot-time entropy starvation</li><li>Case pattern: predictable keys at scale</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>If a device's effective entropy at key-generation time is only, say, 20 bits (due to a limited
+  or predictable seed source) instead of the intended 128 bits, the resulting key space shrinks from
+  2^128 possibilities to roughly 2^20 — over a million times weaker, and potentially brute-forceable in seconds
+  to minutes depending on the attack.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a device without a hardware TRNG seeds its PRNG using only the current
+  timestamp and a fixed serial number at first boot. If the timestamp resolution is coarse (seconds) and the
+  serial number is sequential across a manufacturing batch, many devices in the same batch, powered on around
+  the same time, can end up with substantially overlapping or predictable "random" keys.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">ENTROPY SOURCE AUDIT
+[ ] Does this chip have a dedicated hardware TRNG?
+[ ] If not, what software entropy sources are used (timing jitter,
+    uninitialized RAM, radio noise)?
+[ ] At what point in boot are cryptographic keys first generated?
+[ ] Is there a guarantee that sufficient entropy has accumulated
+    BEFORE that point, or could key generation race the entropy pool?
+[ ] Are unique per-device values (not just serial numbers) mixed
+    into the seed to avoid batch-wide correlation?</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Weak randomness is one of the few vulnerability classes that can silently defeat
+  otherwise-perfect cryptography — the algorithm, key size, and protocol can all be textbook-correct, and the
+  system is still broken if the "random" key was predictable.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Modern secure microcontrollers increasingly ship a certified hardware TRNG as a
+  baseline feature specifically because this failure class has caused enough real-world incidents that chip
+  vendors now treat it as a checkbox requirement for security-marketed silicon.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Large-scale internet scans have historically found batches of devices sharing
+  identical or highly correlated cryptographic keys, traced back to exactly this boot-time entropy problem —
+  a well-documented and still-recurring research finding across device categories.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A widely cited research finding scanned millions of devices and found a meaningful fraction
+  shared RSA keys or had factorable keys due to weak randomness at generation time — directly traceable to
+  embedded devices generating keys before sufficient entropy had accumulated.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Any pseudo-random function is fine as long as the algorithm is strong." — A strong PRNG algorithm with a weak or predictable seed still produces predictable output.</li><li>"If the chip doesn't advertise a TRNG, software entropy sources are just as good." — Software-only entropy sources are often weaker and slower to accumulate sufficient randomness, especially at boot.</li><li>"This is only a theoretical risk." — Large-scale internet scans have repeatedly found real devices with shared or weak keys traceable to exactly this issue.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>TRNG vs. PRNG on embedded chips</li><li>Boot-time entropy starvation</li><li>Case pattern: predictable keys at scale</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>TRNG</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>True Random Number Generator — hardware that harvests physical entropy sources to produce genuinely unpredictable output.</dd><dt><b>PRNG</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Pseudo-Random Number Generator — a deterministic algorithm that expands a seed into a longer, statistically random-looking stream.</dd><dt><b>Entropy starvation</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A condition where insufficient randomness has accumulated to safely generate cryptographic material.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is 'boot-time entropy starvation'?</p><button class="quiz-opt" data-correct="false">A device running out of battery during boot</button><button class="quiz-opt" data-correct="true">Generating cryptographic keys before enough environmental randomness has accumulated to seed the random number generator safely</button><button class="quiz-opt" data-correct="false">A software update failure</button><button class="quiz-opt" data-correct="false">A network connectivity issue at startup</button>
+        <div class="quiz-explain">If keys are generated too early in boot, before sufficient entropy has accumulated, the resulting 'random' values can be predictable or correlated across devices.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-90B: Recommendation for the Entropy Sources Used for Random Bit Generation</li><li>Research on factorable RSA keys from internet-wide scans (Heninger et al.)</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-03/public-key-crypto-and-tls-for-constrained-devices.html">
+          <span class="dir">← Previous</span>Public-Key Crypto, Certificates & (D)TLS for Constrained Devices</a><a class="next" href="../../weeks/week-03/key-management-and-crypto-agility-fleets.html">
+          <span class="dir">Next →</span>Key Management & Crypto Agility Across Device Fleets</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

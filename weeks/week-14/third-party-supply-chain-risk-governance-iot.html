@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Third-Party/Supply-Chain Risk & Governance Reporting for IoT · IoT &amp; CPS Security</title>
+<meta name="description" content="Assess a component supplier's security posture before integration.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-14/third-party-supply-chain-risk-governance-iot" data-title="Third-Party/Supply-Chain Risk & Governance Reporting for IoT" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-14/index.html">Week 14</a> / Third-Party/Supply-Chain Risk & Governance Reporting for IoT</nav>
+<article class="article">
+  <span class="kicker">Week 14 · Lesson 5 · Core</span>
+  <h1>Third-Party/Supply-Chain Risk & Governance Reporting for IoT</h1>
+  <p class="lede">Assess a component supplier's security posture before integration.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 14 closes by looking outside the organization's own walls entirely: at the chip
+  vendors, module suppliers, and SDK providers whose security posture becomes, whether acknowledged or not, part
+  of your own product's security posture the moment you integrate their component.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Assess a component supplier's security posture before integration.</li><li>Produce governance reporting that covers supply-chain risk transparently.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–13 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Supplier security assessment</b> extends Week 4's SBOM material to a formal, pre-integration
+  process: before adopting a chip, module, or SDK, assessing the supplier's own security practices (do they have
+  a disclosure process? a patch history? known unaddressed vulnerabilities?) rather than discovering these
+  answers only after a vulnerability surfaces in production.</p>
+  <p><b>Chip/module provenance risk</b> concerns whether a component's actual manufacturing and supply chain
+  matches what's claimed — counterfeit or substituted components can introduce risk (different, unaudited
+  firmware; weaker or absent security features) invisible without deliberate provenance verification.</p>
+  <p><b>Governance reporting for supply-chain risk</b> means the portfolio risk register (previous lesson) should
+  explicitly include supply-chain-derived risk, not just risk from the organization's own design and
+  implementation choices — a supplier vulnerability is still your product's vulnerability from a user's
+  perspective.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  SUPPLIER[Chip/module/SDK supplier] -->|security posture,\npatch history, provenance| PRODUCT[Your product]
+  PRODUCT --> RISK[Portfolio risk register\n-- must include supply-chain risk]
+  SUPPLIER -.counterfeit/substituted\ncomponent risk.-> PRODUCT</pre><div class="diagram-caption">A supplier's security posture becomes part of your product's security posture upon integration.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Supplier security assessment</li><li>Chip/module provenance risk</li><li>Governance reporting formats for supply chain</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a supplier-risk inheritance framing: your product's effective security
+  ceiling for any given component is bounded by that supplier's own security practices — no amount of careful
+  integration work fully compensates for a chip vendor with no vulnerability disclosure process and a history of
+  unaddressed known issues.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a product team selects a low-cost Wi-Fi module from a supplier with no
+  public security advisory history and no documented disclosure process. A later-discovered vulnerability in
+  that module's firmware has no clear patch path, since the supplier has no established process for receiving or
+  acting on vulnerability reports — a risk that a pre-integration supplier security assessment would have
+  surfaced before the design decision was locked in.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">SUPPLIER SECURITY ASSESSMENT CHECKLIST (before integration)
+Component: ________________________________
+Supplier has a documented vulnerability disclosure process? [ ] Y [ ] N
+Supplier has a track record of timely patches for past issues? ______
+SBOM/component provenance verifiable (Week 4)? [ ] Y [ ] N
+Known unaddressed vulnerabilities in current version? ________________
+Risk entered into portfolio risk register as supply-chain-derived? __</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Supply-chain risk assessment is one of the few controls that has to happen before
+  a design decision is locked in — unlike most controls in this course, which can be added or improved after
+  initial development, a poor component choice often can't be easily reversed once a product's hardware design is
+  finalized.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Regulatory pressure (this week's earlier lesson) increasingly extends explicitly to
+  supply-chain transparency requirements, with SBOM-related mandates in several jurisdictions specifically
+  targeting the provenance and patch-history visibility this lesson describes.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Supply-chain security research continues to develop better tooling for automated
+  provenance verification and supplier security posture scoring, aiming to make this assessment less dependent
+  on manual, ad hoc vendor questionnaires.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Multiple large-scale IoT security incidents have been traced back to a shared, vulnerable
+  third-party component used across many otherwise-unrelated products from different vendors — illustrating how
+  supply-chain risk can have consequences extending far beyond any single organization's direct engineering
+  decisions.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Supply-chain risk is the supplier's problem, not the integrating product's." — From an end-user's perspective, a supplier's vulnerability is still your product's vulnerability.</li><li>"Supplier security assessment is only necessary for large, expensive components." — Even low-cost modules and SDKs can introduce significant risk if the supplier's security practices are inadequate.</li><li>"Once a component passes initial assessment, no further supply-chain monitoring is needed." — Supplier security posture and patch history should be monitored on an ongoing basis, not just at initial integration.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Supplier security assessment</li><li>Chip/module provenance risk</li><li>Governance reporting formats for supply chain</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Provenance</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Verifiable information about a component's origin and manufacturing history, used to detect counterfeit or substituted parts.</dd><dt><b>Supply-chain risk</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Risk introduced into a product through the security posture or practices of its component suppliers.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is supplier security assessment particularly important to conduct before a component is integrated into a product design, rather than after?</p><button class="quiz-opt" data-correct="false">It has no real time sensitivity</button><button class="quiz-opt" data-correct="true">A poor component choice is often difficult or costly to reverse once a product's hardware design is finalized, unlike many other security controls that can be added later</button><button class="quiz-opt" data-correct="false">Suppliers always fix any issues immediately regardless of when they're raised</button><button class="quiz-opt" data-correct="false">Component selection has no bearing on overall product security</button>
+        <div class="quiz-explain">Unlike many controls that can be improved after initial development, hardware component choices are often locked in early and costly to change, making pre-integration supplier assessment especially valuable.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-161: Cybersecurity Supply Chain Risk Management Practices</li><li>CISA guidance on ICT supply chain risk management</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-14/risk-management-controls-assurance-iot-programs.html">
+          <span class="dir">← Previous</span>Risk Management, Controls & Assurance for IoT Programs</a><a class="next" href="../../weeks/week-15/ot-ics-scada-security-deep-dive.html">
+          <span class="dir">Next →</span>OT/ICS/SCADA Security Deep Dive (Purdue model, PLCs, Modbus/DNP3/OPC-UA)</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

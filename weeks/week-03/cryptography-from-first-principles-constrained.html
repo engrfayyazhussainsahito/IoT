@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cryptography From First Principles on Resource-Constrained Hardware · IoT &amp; CPS Security</title>
+<meta name="description" content="Explain why algorithm choice on a microcontroller differs from a server.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-03/cryptography-from-first-principles-constrained" data-title="Cryptography From First Principles on Resource-Constrained Hardware" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-03/index.html">Week 03</a> / Cryptography From First Principles on Resource-Constrained Hardware</nav>
+<article class="article">
+  <span class="kicker">Week 03 · Lesson 1 · Core</span>
+  <h1>Cryptography From First Principles on Resource-Constrained Hardware</h1>
+  <p class="lede">Explain why algorithm choice on a microcontroller differs from a server.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Every cryptographic decision on a server assumes near-infinite CPU, RAM, and power.
+  None of those assumptions hold on a coin-cell-powered sensor. This lesson resets your intuition for what
+  "cheap" and "expensive" mean when the budget is measured in microjoules, not dollars.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Explain why algorithm choice on a microcontroller differs from a server.</li><li>Estimate the cost of common primitives on a Cortex-M class chip.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–2 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Three budgets shape every cryptographic choice on constrained hardware:</p>
+  <ul>
+    <li><b>Compute budget</b> — a Cortex-M0 core has no floating point and limited instruction throughput;
+    public-key operations that take microseconds on a server can take hundreds of milliseconds here.</li>
+    <li><b>Memory budget</b> — some microcontrollers have as little as a few kilobytes of RAM; an algorithm's
+    working-memory footprint can rule it out entirely, independent of CPU cost.</li>
+    <li><b>Power budget</b> — every CPU cycle costs energy; on a battery-powered device, cryptographic overhead
+    directly subtracts from battery life, sometimes measured in years.</li>
+  </ul>
+  <p>Hardware crypto accelerators (AES engines, true random number generators built into silicon) can shift this
+  calculus dramatically — an operation that's prohibitively expensive in software can become nearly free with
+  dedicated hardware support, which is why chip selection is itself a security-relevant engineering decision.</p>
+  <p>Constant-time implementation — ensuring an operation takes the same time regardless of secret data — matters
+  even more on constrained devices, where a simpler, more easily side-channel-observable implementation is often
+  the default choice under resource pressure.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  D{Choosing a\ncrypto primitive} --> C[Compute cost]
+  D --> M[Memory footprint]
+  D --> P[Power/energy cost]
+  D --> HW[Hardware acceleration available?]
+  HW -->|yes| D
+  HW -->|no| SW[Software-only cost applies fully]</pre><div class="diagram-caption">The 'best' algorithm on paper can be the wrong choice for a specific chip's actual budget.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Compute/memory/power budgets</li><li>Hardware crypto accelerators</li><li>Constant-time implementation basics</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>A rough energy-cost comparison often cited in embedded crypto literature: an ECC point
+  multiplication can cost on the order of 10-100x the energy of a symmetric AES-CCM operation on the same
+  constrained hardware. This asymmetry is exactly why protocols minimize how often public-key operations occur
+  (see Week 3's later lessons on session design).</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: choosing between software AES and a hardware AES peripheral on a
+  microcontroller that has one. The hardware peripheral typically completes an encryption operation in a
+  fraction of the CPU cycles and energy of a software implementation, and — as a side benefit — is far less
+  likely to have timing variations tied to the key, since the hardware implementation is usually constant-time
+  by design.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">CRYPTO BUDGET WORKSHEET (per operation, rough estimates)
+Operation                  | Software cost (relative) | Hardware-accelerated cost
+------------------------------------------------------------------------------
+AES-128 encrypt (1 block)   | 1x baseline                | ~0.05-0.2x baseline
+ECC P-256 point multiply     | 50-200x baseline            | ~2-10x baseline (if accelerator present)
+SHA-256 (1 block)             | ~1-2x baseline               | ~0.1-0.3x baseline
+
+Use this shape of table (with real benchmarks for your target chip)
+before committing to a protocol's crypto design.</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Resource pressure is a common root cause of weakened cryptography in the field —
+  a team facing a tight power budget may reach for a smaller key size or a home-rolled lightweight scheme rather
+  than a vetted lightweight standard, trading security margin for a power win that a hardware accelerator or
+  protocol-level optimization could have provided more safely.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Silicon vendors increasingly market "security-enabled" microcontroller lines
+  specifically featuring hardware crypto accelerators and secure key storage as a differentiator — chip
+  selection has become a genuine security architecture decision, not just a cost/performance one.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>The NIST Lightweight Cryptography project (covered in the next lesson) exists
+  precisely because this budget problem is real and widespread enough to warrant standardizing new primitives
+  rather than leaving every vendor to improvise its own trade-offs.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Multiple documented cases show battery-life pressure leading product teams to disable or
+  weaken TLS certificate validation, or to skip encryption on "less sensitive" telemetry entirely, as a power
+  optimization — illustrating how budget constraints can erode security if not addressed with the right
+  primitive choices from the start.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"The most secure algorithm on paper is always the right choice." — On constrained hardware, an algorithm that can't fit the power/memory budget may get bypassed or weakened entirely, which is worse.</li><li>"Hardware acceleration means you don't need to think about crypto choices." — You still need to select and correctly use the right primitive; hardware just changes the cost calculus.</li><li>"Constant-time coding only matters for servers facing network attackers." — Physical or local-network attackers can exploit timing side-channels on embedded devices too (see Week 6).</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Compute/memory/power budgets</li><li>Hardware crypto accelerators</li><li>Constant-time implementation basics</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Hardware crypto accelerator</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A dedicated hardware block that performs cryptographic operations (e.g., AES, SHA) far more efficiently than general-purpose software.</dd><dt><b>Constant-time implementation</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Code written so its execution time does not depend on secret data, preventing timing side-channel leaks.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why might a resource-constrained device use a hardware crypto accelerator instead of a software implementation?</p><button class="quiz-opt" data-correct="false">It's required by law</button><button class="quiz-opt" data-correct="true">It typically offers much lower energy and compute cost, and is often constant-time by design</button><button class="quiz-opt" data-correct="false">It uses more memory but is otherwise identical</button><button class="quiz-opt" data-correct="false">Software implementations are always more secure</button>
+        <div class="quiz-explain">Hardware accelerators generally cost far less energy and compute than software equivalents, and often avoid timing side-channels inherent to naive software implementations.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST Lightweight Cryptography project overview</li><li>"Guide to Elliptic Curve Cryptography" (Hankerson, Menezes, Vanstone) — cost comparison chapters</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-02/privilege-services-logs-and-hardening-embedded.html">
+          <span class="dir">← Previous</span>Privilege, Services, Logs & Hardening on Embedded Linux/RTOS</a><a class="next" href="../../weeks/week-03/lightweight-and-symmetric-crypto.html">
+          <span class="dir">Next →</span>Lightweight & Symmetric Crypto (AES-CCM, ChaCha20, NIST lightweight standards)</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

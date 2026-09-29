@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capstone Scenario Charter & Success Criteria · IoT &amp; CPS Security</title>
+<meta name="description" content="Interpret a capstone scenario charter and its grading criteria.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-16/capstone-scenario-charter-success-criteria" data-title="Capstone Scenario Charter & Success Criteria" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-16/index.html">Week 16</a> / Capstone Scenario Charter & Success Criteria</nav>
+<article class="article">
+  <span class="kicker">Week 16 · Lesson 1 · Capstone</span>
+  <h1>Capstone Scenario Charter & Success Criteria</h1>
+  <p class="lede">Interpret a capstone scenario charter and its grading criteria.</p>
+  <div class="meta-row">
+    <span><b>40 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">The capstone is the course's final integration point: a multi-week project spanning
+  assessment, defense, incident response, governance, and career reflection. This first lesson is about reading
+  the charter correctly — because a misunderstood scope is the single most common reason capstone projects run
+  into trouble.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Interpret a capstone scenario charter and its grading criteria.</li><li>Plan a multi-week capstone deliverable schedule.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–15 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>A well-formed capstone charter has four parts, and you should be able to locate each one before
+  writing anything: the fictional organization's profile (size, industry, device fleet), the specific scenario
+  driving the work (an assessment request, an incident, a compliance deadline), explicit success criteria tied
+  to the grading rubric, and constraints (timeline, assumed team size, what's out of scope).</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">gantt
+    title Capstone Milestones (example)
+    dateFormat  X
+    axisFormat %s
+    section Assessment
+    Fleet risk assessment      :a1, 0, 5
+    section Response
+    IR/forensics drill         :a2, after a1, 4
+    section Communication
+    Executive brief            :a3, after a2, 3
+    section Wrap-up
+    Portfolio + defense        :a4, after a3, 3</pre><div class="diagram-caption">Treat each Week 16 lesson as a milestone with its own deliverable, not one big deadline.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Reading a scenario charter</li><li>Success-criteria breakdown</li><li>Milestone planning</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a scope-clarity check: for every sentence in the charter, ask "does this
+  define scope, or just flavor?" Confusing narrative color for a scope requirement is the fastest way to
+  over- or under-deliver.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a charter states "Northwind Facilities operates 40 smart buildings across
+  3 regions." That's flavor, establishing scale. A line reading "your assessment must cover the door-control and
+  HVAC subsystems only" is scope — and going beyond it (say, also assessing the fire-suppression system) may
+  cost you time without earning credit.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">CHARTER READING CHECKLIST
+[ ] Organization profile identified (industry, scale, device types)
+[ ] Triggering scenario identified (why is this work happening now?)
+[ ] Success criteria mapped 1:1 to the grading rubric
+[ ] Explicit out-of-scope items noted
+[ ] Timeline and milestone dates extracted into your own planning doc</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Scope discipline here mirrors professional consulting engagements exactly: work
+  outside an agreed scope isn't "extra value," it's scope creep that can introduce risk (touching systems you
+  weren't authorized to touch) or simply waste billable time.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Real security engagements almost always start with a charter or statement-of-work
+  document with the same four components — this lesson is training you to read that document type, not just
+  this course's version of it.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>N/A for this lesson — it's a professional-practice skill rather than a research
+  topic.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A common capstone pitfall from past cohorts: spending disproportionate effort on a
+  technically interesting but out-of-scope subsystem mentioned only as background color in the charter, at the
+  cost of the in-scope deliverables that are actually graded.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"More scope covered always means a better grade." — Grading follows the rubric and stated success criteria, not raw effort or scope covered.</li><li>"The charter's narrative details are just flavor text to skim." — Some narrative details encode real scope or constraint information.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Reading a scenario charter</li><li>Success-criteria breakdown</li><li>Milestone planning</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Charter</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A document establishing a project's scenario, scope, constraints, and success criteria.</dd><dt><b>Scope creep</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Unplanned expansion of a project's work beyond its originally agreed boundaries.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is the single most common reason capstone projects run into trouble, according to this lesson?</p><button class="quiz-opt" data-correct="false">Lack of technical skill</button><button class="quiz-opt" data-correct="true">Misunderstood or misread project scope from the charter</button><button class="quiz-opt" data-correct="false">Not enough time in the course</button><button class="quiz-opt" data-correct="false">Grading rubrics being kept secret</button>
+        <div class="quiz-explain">Scope misunderstanding — either exceeding or falling short of what the charter actually requires — is identified as the most common capstone pitfall.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>PMI guidance on project charters (general project-management context)</li><li>Sample statement-of-work templates from security consulting practice guides</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-15/secure-by-design-resilience-future-ready-iot.html">
+          <span class="dir">← Previous</span>Secure-by-Design, Cyber Resilience & Future-Ready IoT Programs</a><a class="next" href="../../weeks/week-16/fleet-scale-iot-security-assessment-risk-register.html">
+          <span class="dir">Next →</span>Fleet-Scale IoT Security Assessment & Risk Register</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

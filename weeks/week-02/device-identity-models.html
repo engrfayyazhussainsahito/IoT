@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Device Identity Models (X.509 device certs, PUFs, hardware IDs) · IoT &amp; CPS Security</title>
+<meta name="description" content="Compare certificate-based, PUF-based, and serial-number identity schemes.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-02/device-identity-models" data-title="Device Identity Models (X.509 device certs, PUFs, hardware IDs)" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-02/index.html">Week 02</a> / Device Identity Models (X.509 device certs, PUFs, hardware IDs)</nav>
+<article class="article">
+  <span class="kicker">Week 02 · Lesson 2 · Core</span>
+  <h1>Device Identity Models (X.509 device certs, PUFs, hardware IDs)</h1>
+  <p class="lede">Compare certificate-based, PUF-based, and serial-number identity schemes.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Every control in this course — authentication, authorization, logging, revocation —
+  eventually rests on one question: can the system reliably tell this device apart from every other device? If
+  identity can be cloned or guessed, everything built on top of it is decoration.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Compare certificate-based, PUF-based, and serial-number identity schemes.</li><li>Explain why a cloneable identity undermines every downstream control.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–1 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>Three common identity models, in increasing order of cloning resistance:</p>
+  <ul>
+    <li><b>Serial number / MAC address</b> — trivially readable and clonable; provides no cryptographic
+    guarantee at all, only a label.</li>
+    <li><b>X.509 device certificates</b> — a private key generated (ideally) at manufacturing time, with a
+    certificate signed by a manufacturer CA. Strong, if the private key is genuinely protected from extraction.</li>
+    <li><b>Physically Unclonable Functions (PUFs)</b> — derive a unique identity from microscopic manufacturing
+    variations in the silicon itself, which are (in principle) infeasible to physically replicate even by the
+    original manufacturer.</li>
+  </ul>
+  <p>The certificate model's strength depends entirely on where the private key lives. A key stored in ordinary
+  flash is only as protected as the flash itself; a key generated inside a secure element or derived from a PUF
+  never needs to exist in exportable form at all.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  A[Serial number] -->|trivially cloned| X[Weak]
+  B[X.509 cert, key in flash] -->|clonable with flash access| Y[Moderate]
+  C[X.509 cert, key in secure element] -->|hard to extract| Z[Strong]
+  D[PUF-derived identity] -->|physically unclonable| Z</pre><div class="diagram-caption">Identity strength is really a question of where the secret lives and how hard it is to extract.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>X.509 device certificates & provisioning</li><li>Physically unclonable functions (PUFs)</li><li>Weak identity anti-patterns</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>A PUF's strength is often described by inter-chip Hamming distance: the fraction of bits that
+  differ between two PUFs' responses to the same challenge should approach 50% (maximal uniqueness), while
+  intra-chip distance (same PUF, repeated reads) should approach 0% (reliable repeatability). Real PUFs trade
+  off between these two goals.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: two otherwise identical devices ship with device certificates. Device A
+  stores its private key in a plaintext flash region; Device B generates its key inside a secure element that
+  never exposes it. An attacker with physical access and a flash-dump tool can clone Device A's identity
+  entirely; the same attacker gets nothing usable from Device B's secure element without far more advanced
+  (and expensive) hardware attacks from Week 6.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">IDENTITY MODEL EVALUATION WORKSHEET
+Model: _____________________
+Where does the private/unique secret live? ________________
+Can it be extracted with: a flash dump? ___  a debug port? ___
+                          a side-channel attack? ___
+Does the manufacturer retain a copy that could itself be
+compromised or leaked? ___
+Cloning resistance rating (Weak/Moderate/Strong): ___</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>A cloneable identity doesn't just let one device be impersonated — at fleet scale,
+  a single extracted manufacturing key (if identity is derived from a shared secret rather than per-device) can
+  let an attacker impersonate every device in a product line simultaneously.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Manufacturing-time key provisioning is a real operational challenge: injecting a
+  unique certificate per device at the speed of a production line, without ever letting that key touch an
+  exportable log or database, requires purpose-built hardware security modules on the factory floor.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>PUF research continues to address reliability challenges — environmental factors
+  like temperature and aging can shift a PUF's response over a device's lifetime, requiring error-correction
+  schemes that don't themselves leak information about the underlying secret.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A well-known consumer-electronics case: a shared, hardcoded manufacturing key embedded in
+  firmware across an entire product line let researchers derive valid device certificates for any unit once the
+  key was extracted from a single device — a failure of the "per-device identity" principle at the design
+  stage, not the cryptography itself.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"An X.509 certificate automatically means strong identity." — Strength depends on where the private key lives, not just the certificate format.</li><li>"PUFs eliminate the need for any key storage." — PUFs still require careful error-correction and enrollment processes that themselves need protection.</li><li>"Serial numbers are fine for security purposes if they're long enough." — Length doesn't matter if the value is simply readable/copyable with no cryptographic binding.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>X.509 device certificates & provisioning</li><li>Physically unclonable functions (PUFs)</li><li>Weak identity anti-patterns</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>PUF</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Physically Unclonable Function — a hardware mechanism deriving unique identity from manufacturing variation.</dd><dt><b>Device certificate</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An X.509 certificate binding a public key to a specific device's identity, signed by a manufacturer or trusted CA.</dd><dt><b>Hamming distance (PUF context)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The number of differing bits between two PUF responses, used to measure uniqueness and reliability.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What determines the real-world strength of an X.509-certificate-based device identity?</p><button class="quiz-opt" data-correct="false">The length of the certificate's validity period</button><button class="quiz-opt" data-correct="true">Where and how well the private key is protected from extraction</button><button class="quiz-opt" data-correct="false">The certificate's file size</button><button class="quiz-opt" data-correct="false">Whether the certificate uses RSA or ECC exclusively</button>
+        <div class="quiz-explain">The certificate itself is public; security rests entirely on how well-protected the corresponding private key is.</div></div>
+<div class="quiz-q"><p class="prompt">2. What is a Physically Unclonable Function (PUF) used for?</p><button class="quiz-opt" data-correct="false">Encrypting network traffic</button><button class="quiz-opt" data-correct="true">Deriving a unique device identity from manufacturing-time silicon variations that are infeasible to physically replicate</button><button class="quiz-opt" data-correct="false">Speeding up boot time</button><button class="quiz-opt" data-correct="false">Compressing firmware images</button>
+        <div class="quiz-explain">A PUF exploits inherent, unpredictable manufacturing variation to create an identity that's extremely hard to clone, even by the original manufacturer.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST IR 8259A: IoT Device Cybersecurity Capability Core Baseline (identity requirements)</li><li>Academic surveys of PUF constructions (SRAM PUF, ring-oscillator PUF)</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-02/embedded-operating-systems-from-first-principles.html">
+          <span class="dir">← Previous</span>Embedded Operating Systems & RTOS From First Principles</a><a class="next" href="../../weeks/week-02/authentication-for-constrained-devices.html">
+          <span class="dir">Next →</span>Authentication for Constrained Devices</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

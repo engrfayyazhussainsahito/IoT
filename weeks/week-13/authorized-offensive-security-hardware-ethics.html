@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Authorized Offensive Security From First Principles (hardware RoE/ethics) · IoT &amp; CPS Security</title>
+<meta name="description" content="Explain why hardware pentesting rules of engagement differ from web/app pentests.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-13/authorized-offensive-security-hardware-ethics" data-title="Authorized Offensive Security From First Principles (hardware RoE/ethics)" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-13/index.html">Week 13</a> / Authorized Offensive Security From First Principles (hardware RoE/ethics)</nav>
+<article class="article">
+  <span class="kicker">Week 13 · Lesson 1 · Advanced</span>
+  <h1>Authorized Offensive Security From First Principles (hardware RoE/ethics)</h1>
+  <p class="lede">Explain why hardware pentesting rules of engagement differ from web/app pentests.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 0 set the ground rules for lab work on your own hardware. Week 13 raises the
+  stakes: authorized offensive testing against someone else's product or deployment, where the rules of
+  engagement carry legal weight and the physical nature of the target introduces risks a web pentest never
+  faces.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Explain why hardware pentesting rules of engagement differ from web/app pentests.</li><li>Recognize destructive-testing risks unique to physical devices.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–12 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Hardware-specific RoE considerations</b> that don't arise in web/app pentesting: a physical
+  device can be irreversibly damaged by a test (unlike a web server, which can usually be restored from a
+  snapshot), test units are often limited in supply (sometimes just one borrowed or purchased unit), and some
+  techniques (fault injection, chip decapping) are inherently destructive by nature, not just risky.</p>
+  <p><b>Destructive vs. non-destructive testing</b> needs explicit classification and client sign-off before
+  testing begins — a client may authorize non-destructive firmware analysis but explicitly withhold authorization
+  for chip-level extraction that would destroy the only test unit available.</p>
+  <p><b>Client communication for physical risk</b> means setting expectations differently than a web
+  engagement: "there is a nonzero chance this specific test could permanently damage the device" is a sentence a
+  hardware pentest client needs to hear and explicitly accept before that test proceeds, in writing.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  A[Proposed test technique] --> B{Destructive to\nthe test unit?}
+  B -->|No| C[Standard authorization\nsufficient]
+  B -->|Yes| D[Explicit, separate client\nsign-off required before proceeding]
+  D --> E{Only one test unit\navailable?}
+  E -->|Yes| F[Discuss unit replacement\ncost/availability with client first]</pre><div class="diagram-caption">Destructive techniques need their own explicit authorization layer, separate from general test scope.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Hardware-specific RoE considerations</li><li>Destructive vs. non-destructive testing</li><li>Client communication for physical risk</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a risk-disclosure completeness check: for every technique in your planned
+  test methodology, can you state in one sentence what happens to the physical device if that specific technique
+  fails or damages the unit? If you can't answer that for a given technique, you haven't fully assessed its
+  physical risk yet.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a client provides a single unit of a new IoT product for a pre-launch
+  security assessment. The tester identifies that JTAG access requires desoldering a shield can, which is
+  irreversible. Rather than proceeding under general test authorization, the tester specifically flags this step
+  to the client, explains the alternative (non-destructive testing only, with reduced coverage), and gets
+  written sign-off before deciding how to proceed.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">HARDWARE PENTEST DESTRUCTIVE-ACTION SIGN-OFF TEMPLATE
+Technique: ________________________________
+Destructive to test unit? [ ] Yes [ ] No
+If yes: probability of successful, non-destructive outcome: _______
+        cost/availability of a replacement unit if destroyed: _______
+Client sign-off obtained (separate from general test authorization)? ___
+Alternative non-destructive approach considered (if any): ______________</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Hardware pentest engagements that skip explicit destructive-action sign-off risk a
+  damaged client relationship even when the testing itself is technically sound — the physical, sometimes
+  irreversible nature of hardware testing raises the communication bar compared to typical software pentesting.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Established hardware security consultancies build destructive-vs-non-destructive
+  classification directly into their standard scoping templates and contracts, treating it as a routine part of
+  engagement setup rather than an ad hoc conversation per engagement.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Hardware security research ethics discussions (echoing Week 1's disclosure-ethics
+  lesson) extend naturally to commercial pentesting: the same "what happens if this doesn't work as planned"
+  discipline applies whether the context is academic research or a paid client engagement.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Documented hardware security consulting post-mortems have cited unclear destructive-testing
+  authorization as a source of client disputes, reinforcing why leading firms treat this as a mandatory,
+  explicit, separately-documented sign-off rather than an implicit part of general scope.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"General test authorization implicitly covers any technique needed to complete the assessment." — Destructive techniques warrant their own explicit, separate sign-off given their irreversible nature.</li><li>"Hardware pentesting risk communication is basically the same as web pentesting." — The possibility of permanent physical damage to a limited-supply test unit is a distinct risk category requiring its own discussion.</li><li>"If a technique is standard practice in hardware security research, it doesn't need special client authorization." — Standard practice among researchers doesn't substitute for a specific client's informed consent for their specific unit.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Hardware-specific RoE considerations</li><li>Destructive vs. non-destructive testing</li><li>Client communication for physical risk</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Rules of Engagement (RoE)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The documented scope, boundaries, and authorized techniques for a security testing engagement.</dd><dt><b>Destructive testing</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A testing technique that irreversibly damages or alters the physical device under test.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why do hardware pentest engagements often require separate, explicit sign-off for destructive testing techniques?</p><button class="quiz-opt" data-correct="false">It's a purely bureaucratic requirement with no real purpose</button><button class="quiz-opt" data-correct="true">Destructive techniques can permanently damage a limited-supply test unit, a risk category distinct from typical software pentesting that clients need to explicitly accept</button><button class="quiz-opt" data-correct="false">Destructive techniques are always illegal without special sign-off</button><button class="quiz-opt" data-correct="false">Non-destructive techniques never require any authorization</button>
+        <div class="quiz-explain">Unlike software testing, hardware testing can permanently and irreversibly damage a physical unit, often one of limited supply — a risk category serious enough to warrant explicit, separate client consent.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>PTES (Penetration Testing Execution Standard) — pre-engagement guidelines</li><li>Hardware security consulting firms' public scoping methodology writeups</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-12/reporting-lessons-learned-tabletop-iot.html">
+          <span class="dir">← Previous</span>Reporting, Lessons Learned & Tabletop Exercises for IoT Incidents</a><a class="next" href="../../weeks/week-13/scoping-roe-test-planning-iot-ot-pentests.html">
+          <span class="dir">Next →</span>Scoping, Rules of Engagement & Test Planning for IoT/OT Pentests</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

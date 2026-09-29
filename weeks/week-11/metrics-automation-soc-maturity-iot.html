@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metrics, Automation & SOC Maturity for IoT Fleets · IoT &amp; CPS Security</title>
+<meta name="description" content="Select metrics that reflect fleet-scale detection and response maturity.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-11/metrics-automation-soc-maturity-iot" data-title="Metrics, Automation & SOC Maturity for IoT Fleets" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-11/index.html">Week 11</a> / Metrics, Automation & SOC Maturity for IoT Fleets</nav>
+<article class="article">
+  <span class="kicker">Week 11 · Lesson 5 · Core</span>
+  <h1>Metrics, Automation & SOC Maturity for IoT Fleets</h1>
+  <p class="lede">Select metrics that reflect fleet-scale detection and response maturity.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 11 closes by asking how you'd know if any of the previous four lessons' practices
+  are actually working — what to measure, what to automate safely, and how to benchmark a fleet-scale SOC's
+  maturity against a meaningful standard rather than gut feel.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Select metrics that reflect fleet-scale detection and response maturity.</li><li>Automate repetitive fleet-scale triage steps safely.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–10 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Fleet-scale SOC metrics</b> extend beyond typical IT SOC metrics (mean time to detect, mean
+  time to respond) to include fleet-specific measures: percentage of fleet on current firmware (Week 9), detection
+  rule false-positive rate trends (previous lesson), and cohort-level anomaly resolution time.</p>
+  <p><b>Safe automation guardrails</b> matter especially for OT-adjacent response: given Week 11's opening lesson
+  on change-control interlocks, any automated response action against an OT asset needs the same sign-off logic
+  built into automation as would be required of a human analyst — an automated system that "helpfully" isolates
+  a PLC without the appropriate safety gate is exactly the failure mode this course has warned against
+  throughout.</p>
+  <p><b>Maturity model checkpoints</b> provide a structured way to assess progress: a useful model might track a
+  team's progression from "collecting logs" through "normalizing OT telemetry," "running tuned detections,"
+  "proactive hunting," to "automated, safely-gated response" — giving a fleet-security program concrete
+  milestones rather than an open-ended, undefined improvement goal.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  M1[1. Collecting logs] --> M2[2. Normalizing OT/IoT telemetry]
+  M2 --> M3[3. Tuned detection rules]
+  M3 --> M4[4. Proactive threat hunting]
+  M4 --> M5[5. Safely-gated automated response]</pre><div class="diagram-caption">Each stage builds on the previous lesson's material — this is a synthesis of the whole week, not new material.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Fleet-scale SOC metrics</li><li>Safe automation guardrails for OT-adjacent response</li><li>Maturity model checkpoints</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a metrics-selection principle: choose metrics that would actually change
+  a decision if they moved (e.g., "if false-positive rate crosses X%, we retune"), rather than vanity metrics
+  tracked for their own sake with no defined action tied to their movement.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a SOC automates the first-line triage step of checking whether an anomaly
+  correlates with a known maintenance event (Lesson 11.4's cheap check), automatically closing alerts that match,
+  but explicitly excludes any automated action that would isolate, reboot, or otherwise directly affect an
+  actively-controlling OT asset — reserving that category entirely for human-plus-engineering sign-off per this
+  week's change-control principle.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">SAFE AUTOMATION SCOPE WORKSHEET
+Candidate automation: ________________________________
+Does this action directly affect an actively-controlling OT asset? ___
+  If YES: requires human + operations sign-off gate, cannot be
+          fully automated per this week's change-control principle.
+  If NO (e.g., closing a benign-correlated alert, aggregating data):
+          safe to automate with standard monitoring/audit logging.
+Metric to track automation's own false-negative rate: ________________</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Automation in an OT-adjacent SOC should expand what humans can review and decide
+  quickly, not replace the safety-critical decision points this entire week has identified — the temptation to
+  automate away a change-control gate for efficiency is exactly where automation can introduce new risk rather
+  than reducing it.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>SOC maturity models (in the tradition of frameworks like the SOC-CMM) are
+  increasingly adapted with OT/IoT-specific checkpoints, reflecting that a program can be highly mature by
+  general IT-security standards while still being early-stage specifically in OT/IoT coverage.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Research into safe security-automation guardrails for cyber-physical systems
+  continues to explore formal ways to guarantee an automated response cannot itself trigger an unsafe physical
+  condition — a harder guarantee to provide than typical IT automation safety properties.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Organizations that have measured their own fleet firmware-currency percentage for the first
+  time (Week 9's patch-adoption metric) frequently discover it's much lower than assumed — illustrating the value
+  of fleet-specific metrics that a general IT SOC dashboard would never surface on its own.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"More automation is always better for SOC efficiency." — Automation that bypasses necessary safety/change-control gates for OT assets can introduce new risk rather than reducing it.</li><li>"SOC maturity is a single, general score independent of asset type." — A program can be mature for typical IT assets while still being early-stage specifically for OT/IoT coverage.</li><li>"Any metric that's easy to collect is worth tracking." — Useful metrics are ones tied to a specific decision or action; tracking metrics with no defined response wastes reporting effort.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Fleet-scale SOC metrics</li><li>Safe automation guardrails for OT-adjacent response</li><li>Maturity model checkpoints</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>SOC maturity model</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A structured framework for assessing and progressing a security operations program's capabilities over defined stages.</dd><dt><b>Safe automation guardrail</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A constraint ensuring automated security responses cannot bypass necessary safety or change-control review, especially for OT assets.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why should automated response actions against actively-controlling OT assets generally require a human-plus-operations sign-off gate, per this lesson?</p><button class="quiz-opt" data-correct="false">Automation is never useful in OT contexts</button><button class="quiz-opt" data-correct="true">An automated action that disrupts an actively-controlling asset without appropriate safety review could itself create an unsafe physical condition</button><button class="quiz-opt" data-correct="false">OT assets cannot be monitored by automated systems at all</button><button class="quiz-opt" data-correct="false">Sign-off gates are only a legal formality with no real safety purpose</button>
+        <div class="quiz-explain">This mirrors the change-control interlock principle from earlier in the week: disruptive actions against OT assets can have physical safety consequences, so automation should preserve the human/operations sign-off gate rather than bypass it for speed.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>SOC-CMM (Security Operations Center Capability Maturity Model) framework</li><li>CISA and ICS-CERT guidance on OT security automation best practices</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-11/alert-triage-investigation-threat-hunting-iot-ot.html">
+          <span class="dir">← Previous</span>Alert Triage, Investigation & Threat Hunting in IoT/OT</a><a class="next" href="../../weeks/week-12/ir-first-principles-cyber-physical-incidents.html">
+          <span class="dir">Next →</span>IR From First Principles for Cyber-Physical Incidents</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

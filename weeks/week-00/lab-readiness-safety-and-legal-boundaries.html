@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Readiness, Safety & Legal Boundaries for Hardware Hacking · IoT &amp; CPS Security</title>
+<meta name="description" content="Assemble a minimum viable IoT security lab on a student budget.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-00/lab-readiness-safety-and-legal-boundaries" data-title="Lab Readiness, Safety & Legal Boundaries for Hardware Hacking" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-00/index.html">Week 00</a> / Lab Readiness, Safety & Legal Boundaries for Hardware Hacking</nav>
+<article class="article">
+  <span class="kicker">Week 00 · Lesson 1 · Foundations</span>
+  <h1>Lab Readiness, Safety & Legal Boundaries for Hardware Hacking</h1>
+  <p class="lede">Assemble a minimum viable IoT security lab on a student budget.</p>
+  <div class="meta-row">
+    <span><b>40 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Every hardware security skill in this course assumes you have somewhere safe, legal,
+  and repeatable to practice it. That "somewhere" is not a metaphor — it is a specific bench, a specific
+  network, and a specific written understanding of what you are and are not authorized to touch. This lesson
+  builds that foundation before a single wire gets crossed.</p>
+  <p>Unlike web-application security, where a misconfigured lab mostly costs you a restart, hardware and RF
+  work can damage equipment, violate spectrum regulations, or — if you point a technique at someone else's
+  device — cross a legal line that has nothing to do with your intent. We treat lab setup as a security control
+  in its own right.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Assemble a minimum viable IoT security lab on a student budget.</li><li>Separate authorized research from unauthorized access under CFAA/Computer Misuse Act-style law.</li><li>Apply electrical, RF, and chemical (battery/solder) safety practices.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>No prior lessons required — this is the course's starting point.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>A minimum viable IoT security lab has three layers, and skipping any one of them creates risk
+  later in the course:</p>
+  <ul>
+    <li><b>Bench layer</b> — the physical tools that let you observe and interact with hardware: multimeter,
+    USB-UART adapter, logic analyzer, and eventually an SDR dongle.</li>
+    <li><b>Network layer</b> — an isolated segment (a spare router flashed to act as a bench network, or a VLAN)
+    so a compromised or misbehaving test device can never reach your home network or the internet unsupervised.</li>
+    <li><b>Authorization layer</b> — a plain-language record of what you own, what you've been given explicit
+    permission to test, and what is out of scope. This is the layer most courses skip and the one that matters most.</li>
+  </ul>
+  <p>The authorization layer deserves special emphasis because IoT security research sits at an unusual
+  intersection: the device is physical and often genuinely yours, but the radio spectrum it uses, the cloud
+  service it talks to, and the firmware it runs may all belong to someone else. Owning the object does not
+  automatically authorize every kind of testing against every part of the system.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  A[Device you own] -->|Bench + firmware testing| Z[In scope]
+  A -->|Vendor cloud API| B[Needs vendor authorization]
+  A -->|Shared RF spectrum| C[Regulated - follow local rules]
+  A -->|Neighbor's device on same protocol| D[Never in scope]
+  classDef ok fill:#e3efe6,stroke:#2f6b46,color:#2f6b46;
+  classDef warn fill:#f7e6df,stroke:#9c4221,color:#9c4221;
+  class Z ok
+  class B,C,D warn</pre><div class="diagram-caption">Ownership of a device does not extend to every system it touches.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Bench tools: logic analyzer, USB-UART, multimeter, SDR dongle</li><li>Isolated lab network design (VLAN or air-gapped bench router)</li><li>Legal boundaries: your device vs. someone else's device vs. shared spectrum</li><li>Documenting authorization before you touch a single wire</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>There is no formula here, but there is a decision rule worth memorizing, because you will
+  apply it dozens of times this course:</p>
+  <blockquote>If a reasonable person outside this course would need to ask "did you have permission for that
+  specific action, on that specific system?" — get the answer in writing before you act.</blockquote>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: you buy a smart plug to practice on. You may open it, dump its flash,
+  and analyze its firmware — you own the physical object. You may <em>not</em> port-scan the vendor's cloud
+  API from your home IP, because that infrastructure belongs to the vendor and other customers share it.
+  If you want to test the cloud side, you look for a vendor bug-bounty program or written authorization first.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">LAB AUTHORIZATION LOG (keep one per device)
+Device:            Acme SmartPlug v2 (owned, purchased 2026-01-10)
+In scope:          Hardware teardown, flash dump, firmware static analysis,
+                    local network traffic capture on isolated bench VLAN
+Out of scope:      Vendor cloud API, other customers' devices, production
+                    firmware update servers
+Network:           Bench VLAN 10 (no internet egress except signed firmware
+                    downloads via allow-listed vendor domain)
+Authorization:     Personal property; no third-party systems touched
+Reviewed:          2026-01-10</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>From a security-engineering view, lab discipline is a control that prevents your
+  own research from becoming the incident you're trying to prevent. A test device that quietly reaches a
+  production API, or a glitch tool left connected to a network by mistake, is a realistic way for a student
+  lab to cause real-world harm without anyone intending it.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Professional hardware security teams formalize this as a documented rules-of-engagement
+  process even for internal research — not because anyone doubts good intent, but because clear scope protects
+  the researcher as much as the target. Expect every later lesson on offensive testing (Week 13) to return to
+  this same discipline at a larger scale.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Academic IoT security research groups typically route hardware and RF work through
+  an institutional review process specifically because spectrum and CFAA-style computer-misuse law vary by
+  jurisdiction and change over time. Treat "I read the law once" as insufficient — check current guidance
+  before RF-heavy or cross-border work.</p>
+
+  <h2>13. Case Study</h2>
+  <p>A common failure pattern in student labs: a "test" device is left provisioned with a real
+  vendor account so setup is faster. Weeks later, a classroom network change exposes that device to the
+  internet, and it silently resumes talking to production cloud infrastructure under a real account. Nothing
+  malicious happened — but it is exactly the kind of scope creep that a written authorization log would have
+  caught at setup time.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"I bought it, so I can test anything connected to it." — Ownership of the object does not cover the vendor's cloud, other users, or shared spectrum.</li><li>"It's just a hobbyist board, the rules don't really apply." — Legal exposure depends on the action and target, not the price of the hardware.</li><li>"Isolation is optional if I'm careful." — Careful humans still make one mistake; isolated networks contain the blast radius when they do.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Bench tools: logic analyzer, USB-UART, multimeter, SDR dongle</li><li>Isolated lab network design (VLAN or air-gapped bench router)</li><li>Legal boundaries: your device vs. someone else's device vs. shared spectrum</li><li>Documenting authorization before you touch a single wire</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Authorization boundary</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The explicit, written scope of systems and actions a researcher is permitted to test.</dd><dt><b>Bench VLAN</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An isolated network segment used for hardware/firmware testing, kept separate from production and home networks.</dd><dt><b>Responsible research scope</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The practice of limiting testing to systems you own or have explicit written permission to test.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. You own a smart camera outright. Which action is safely in scope without extra authorization?</p><button class="quiz-opt" data-correct="false">Port-scanning the vendor's cloud API</button><button class="quiz-opt" data-correct="true">Dumping and analyzing the camera's own flash memory</button><button class="quiz-opt" data-correct="false">Testing another customer's camera on the same protocol</button><button class="quiz-opt" data-correct="false">Jamming the 2.4GHz band to test resilience</button>
+        <div class="quiz-explain">Analyzing the flash memory of hardware you own is in scope. The cloud API, other customers' devices, and spectrum jamming all involve systems or shared resources you don't have unilateral authority over.</div></div>
+<div class="quiz-q"><p class="prompt">2. What is the primary purpose of an isolated bench network?</p><button class="quiz-opt" data-correct="false">To make internet access faster for lab devices</button><button class="quiz-opt" data-correct="true">To contain the blast radius if a test device misbehaves or is compromised</button><button class="quiz-opt" data-correct="false">To avoid paying for a second router</button><button class="quiz-opt" data-correct="false">To bypass vendor terms of service</button>
+        <div class="quiz-explain">Isolation limits how far a mistake or compromise can spread — the core purpose of the network layer of a lab.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-213: IoT Device Cybersecurity Guidance for the Federal Government</li><li>OWASP IoT Security Testing Guide — lab setup chapter</li><li>Local computer-misuse and radio-spectrum regulations for your jurisdiction</li></ul>
+
+  <div class="prevnext"><span></span><a class="next" href="../../weeks/week-00/embedded-linux-and-rtos-from-zero.html">
+          <span class="dir">Next →</span>Embedded Linux & RTOS From Zero</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

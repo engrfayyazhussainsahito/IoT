@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buffer Overflows & Memory Corruption in Firmware · IoT &amp; CPS Security</title>
+<meta name="description" content="Explain how a buffer overflow in a protocol parser leads to control-flow hijack.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-05/buffer-overflows-memory-corruption-firmware" data-title="Buffer Overflows & Memory Corruption in Firmware" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-05/index.html">Week 05</a> / Buffer Overflows & Memory Corruption in Firmware</nav>
+<article class="article">
+  <span class="kicker">Week 05 · Lesson 3 · Advanced</span>
+  <h1>Buffer Overflows & Memory Corruption in Firmware</h1>
+  <p class="lede">Explain how a buffer overflow in a protocol parser leads to control-flow hijack.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">This is the lesson where a lot of this week's material converges into the classic
+  attack: an attacker sends more data than a buffer was sized to hold, overwrites adjacent memory, and redirects
+  program execution. On firmware, the lack of standard mitigations makes this attack far more reliable than on a
+  modern desktop OS.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Explain how a buffer overflow in a protocol parser leads to control-flow hijack.</li><li>Recognize why lack of ASLR/NX changes exploitation on many MCUs.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–4 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>The classic anatomy: a fixed-size stack buffer receives attacker-controlled data via an
+  unchecked copy (like <code>strcpy</code> or a manual loop without bounds checking). Data beyond the buffer's
+  size overwrites adjacent stack memory — potentially including a saved return address. If the attacker controls
+  enough of the overwritten data, they can redirect execution to code of their choosing when the function
+  returns.</p>
+  <p>Desktop and server systems have layered mitigations against exactly this: <b>ASLR</b> (Address Space Layout
+  Randomization) makes memory addresses unpredictable, and <b>NX/DEP</b> (No-eXecute / Data Execution Prevention)
+  marks data memory as non-executable. Many cheap microcontrollers have neither — no MMU means no ASLR, and many
+  have no mechanism to mark memory regions non-executable at all, making a successful overflow far more directly
+  exploitable than the equivalent bug on a modern PC.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  A[Local buffer, e.g. 32 bytes] --> B[Adjacent stack data]
+  B --> C[Saved return address]
+  D[Attacker sends 64 bytes] -->|overflows buffer| A
+  D -.overwrites.-> C
+  C -->|on function return| E[Execution redirected to attacker-chosen address]
+  style E fill:#f7e6df,stroke:#9c4221</pre><div class="diagram-caption">Without ASLR/NX, the attacker's job of predicting and using this overwrite is far easier.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Classic overflow anatomy on firmware</li><li>Missing mitigations on cheap MCUs</li><li>Real-world firmware CVEs, at a conceptual level</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a mitigation-availability check for your target: does the chip have an
+  MMU (a prerequisite for meaningful ASLR)? Does the toolchain support any per-region execute-permission control?
+  If the answer to both is no, treat every unbounded copy into a stack or heap buffer as a critical, directly
+  exploitable finding, not a theoretical one.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example, conceptual: a network protocol parser copies an attacker-supplied field
+  into a fixed 32-byte stack buffer using a loop with no length check. Sending a 64-byte field overflows the
+  buffer, overwriting the saved return address with an attacker-chosen value. On a chip with no NX enforcement,
+  the attacker's payload can even be placed in the overflowed data itself and directly executed.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-c">// Vulnerable: no bounds check on attacker-controlled length
+void parse_field(uint8_t *data, uint16_t len) {
+    char buf[32];
+    for (uint16_t i = 0; i < len; i++) {   // len is attacker-controlled!
+        buf[i] = data[i];                  // overflow if len > 32
+    }
+}
+
+// Fixed: enforce the buffer's actual bound
+void parse_field(uint8_t *data, uint16_t len) {
+    char buf[32];
+    uint16_t safe_len = (len > sizeof(buf)) ? sizeof(buf) : len;
+    memcpy(buf, data, safe_len);
+}</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>The absence of ASLR and NX on many microcontrollers means the standard "make
+  exploitation probabilistic and hard" mitigations desktop security relies on simply aren't available — memory
+  safety has to be achieved through correct code and language choice (Lesson 5.4) rather than runtime mitigation.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Higher-end microcontrollers (Cortex-M with an MPU, or Cortex-A with a full MMU)
+  increasingly support some subset of these mitigations, making chip selection itself a meaningful security
+  decision for products handling untrusted network or RF input.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Academic and industry research into lightweight control-flow integrity (CFI)
+  schemes for constrained devices aims to provide some of ASLR/NX's protective effect without the memory and
+  compute overhead of a full implementation — an active area given how many devices lack these protections
+  entirely today.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Numerous firmware CVEs across router, camera, and industrial-device product lines follow this
+  exact pattern: an attacker-controlled length field, an unbounded copy, and — due to missing memory
+  protections — a directly exploitable remote code execution vulnerability rather than a mere crash.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Buffer overflows are a solved problem thanks to modern mitigations." — Modern mitigations are common on desktops/servers but frequently absent on constrained microcontrollers.</li><li>"A crash from an overflow is the worst-case outcome." — On systems without NX/ASLR, a crash is often the mild outcome; full code execution is realistically achievable.</li><li>"This only affects old or poorly maintained firmware." — This bug class continues to appear in actively maintained, modern firmware releases.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Classic overflow anatomy on firmware</li><li>Missing mitigations on cheap MCUs</li><li>Real-world firmware CVEs, at a conceptual level</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>ASLR</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>Address Space Layout Randomization — a mitigation that randomizes memory addresses to make exploitation harder, requiring an MMU.</dd><dt><b>NX/DEP</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>No-eXecute / Data Execution Prevention — marking memory regions as non-executable to prevent injected code from running.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why are buffer overflows often more directly exploitable on cheap microcontrollers than on modern desktop systems?</p><button class="quiz-opt" data-correct="false">Microcontrollers have faster CPUs</button><button class="quiz-opt" data-correct="true">Many lack ASLR and NX/DEP mitigations that make exploitation on desktop systems probabilistic and harder</button><button class="quiz-opt" data-correct="false">Microcontrollers don't have a stack</button><button class="quiz-opt" data-correct="false">Overflow bugs can't occur on microcontrollers</button>
+        <div class="quiz-explain">Without an MMU (for ASLR) or execute-permission control (for NX/DEP), an overflow on many microcontrollers can be exploited far more reliably than the equivalent bug on a modern desktop OS.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>CWE-121: Stack-based Buffer Overflow</li><li>"Smashing the Stack for Fun and Profit" (Aleph One) — foundational, historical reference on the mechanics</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-05/stack-heap-process-memory-bare-metal.html">
+          <span class="dir">← Previous</span>Stack/Heap/Process Memory on Bare-Metal & RTOS Targets</a><a class="next" href="../../weeks/week-05/mitigations-memory-safe-languages-embedded.html">
+          <span class="dir">Next →</span>Mitigations & Memory-Safe Languages for Embedded (Rust for embedded)</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

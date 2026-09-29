@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Device Hardening & Patch/Update Management at Fleet Scale · IoT &amp; CPS Security</title>
+<meta name="description" content="Design a phased rollout strategy for a fleet-wide firmware patch.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-09/device-hardening-patch-management-fleet-scale" data-title="Device Hardening & Patch/Update Management at Fleet Scale" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-09/index.html">Week 09</a> / Device Hardening & Patch/Update Management at Fleet Scale</nav>
+<article class="article">
+  <span class="kicker">Week 09 · Lesson 2 · Core</span>
+  <h1>Device Hardening & Patch/Update Management at Fleet Scale</h1>
+  <p class="lede">Design a phased rollout strategy for a fleet-wide firmware patch.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 4 covered the OTA pipeline's technical mechanics. This lesson is about the
+  organizational and operational problem sitting on top of it: getting a security patch onto tens of thousands of
+  real, heterogeneous, sometimes-offline devices without breaking anything or leaving a large fraction of the
+  fleet permanently behind.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Design a phased rollout strategy for a fleet-wide firmware patch.</li><li>Handle devices that never check in for updates.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–8 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Canary/staged rollouts</b> (introduced in Week 3's key-rotation context) apply directly here:
+  release a patch to a small, monitored subset first, watch for unexpected failures, then progressively widen
+  the rollout — catching a bad patch's blast radius before it reaches the full fleet.</p>
+  <p><b>Handling offline/unreachable devices</b> requires an explicit policy, not silence: devices that miss a
+  patch window need to be tracked, flagged, and — for security-relevant patches — potentially treated as
+  elevated-risk assets requiring compensating network-level controls (Week 7) until they do check in.</p>
+  <p>A <b>hardening baseline at scale</b> means the same baseline from Week 2's individual-device lesson, but
+  now with fleet-wide compliance tracking: what percentage of the fleet currently meets the baseline, and which
+  specific devices or cohorts don't.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  A[Canary: 1% of fleet] -->|monitor 24-48h| B{Issues found?}
+  B -->|Yes| STOP[Halt rollout, investigate]
+  B -->|No| C[Broader: 25% of fleet]
+  C --> D[Full fleet]
+  D --> E{Devices that never checked in?}
+  E -->|Yes| F[Flag as elevated risk,\napply compensating network controls]</pre><div class="diagram-caption">A rollout plan is incomplete without an explicit answer for the devices it never reaches.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Canary/staged rollouts</li><li>Handling offline/unreachable devices</li><li>Hardening baselines at scale</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a patch-adoption tracking metric every fleet operator should maintain:
+  percentage of fleet on current firmware version, tracked over time after each release, with an explicit alert
+  threshold if adoption stalls below an expected curve.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a canary rollout to 1% of a fleet reveals an unexpected interaction
+  between the new firmware and a specific hardware revision sold only in one region — a compatibility bug that
+  would have caused widespread device failures if pushed directly to 100% of the fleet, caught instead at
+  minimal cost by the staged approach.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">FLEET PATCH ROLLOUT PLAN TEMPLATE
+Patch: __________  Severity: __________
+Stage 1 (canary): ____% of fleet, monitor for ____ hours
+Stage 2 (broad):  ____% of fleet, monitor for ____ hours
+Stage 3 (full):   100%
+Rollback trigger criteria: ________________________
+Offline-device policy: devices not checked in within ____ days are
+  flagged as [elevated risk / requiring compensating controls / other]</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>An unpatched device isn't just individually vulnerable — at fleet scale, a
+  meaningful percentage of never-updated devices becomes a persistent, exploitable population that undermines
+  the security value of even a perfectly executed patch release for the rest of the fleet.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Fleet management platforms increasingly surface patch-adoption dashboards as a
+  first-class operational metric, similar to how uptime or error rates are tracked — treating security patch
+  compliance as an ongoing operational KPI rather than a one-time release event.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Longitudinal studies of IoT patch adoption rates consistently find long tails of
+  never-updated devices persisting for years after a patch's release, reinforcing that rollout planning must
+  assume incomplete adoption as the normal case, not an edge case.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Large-scale botnet studies (Mirai and successors, next lesson's topic) have repeatedly found
+  their exploited device populations dominated by units that never received an available patch — a direct,
+  large-scale illustration of what happens when offline/unreachable-device policy is left undefined.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Releasing a patch means the fleet is now protected." — Patch availability and fleet-wide adoption are very different things; adoption must be actively tracked and managed.</li><li>"Staged rollouts just slow down getting a fix out." — They typically catch fewer, smaller failures early rather than a fleet-wide failure discovered only after full rollout.</li><li>"There's nothing to do about devices that never check in." — Compensating network-level controls (Week 7) can reduce risk from unreachable, unpatched devices even without direct remediation.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Canary/staged rollouts</li><li>Handling offline/unreachable devices</li><li>Hardening baselines at scale</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Canary rollout</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A staged deployment strategy applying a change to a small subset of a fleet before wider release.</dd><dt><b>Patch adoption rate</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The percentage of a device fleet that has successfully received and applied a given update.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is the primary benefit of a canary/staged rollout for a fleet-wide firmware patch?</p><button class="quiz-opt" data-correct="false">It makes the rollout faster overall</button><button class="quiz-opt" data-correct="true">It limits the blast radius of an unexpected patch problem by catching it in a small subset before full fleet exposure</button><button class="quiz-opt" data-correct="false">It reduces the size of the patch file</button><button class="quiz-opt" data-correct="false">It eliminates the need for any monitoring</button>
+        <div class="quiz-explain">Staged rollouts deliberately expose only a small, monitored subset of the fleet first, so an unexpected compatibility or stability issue is caught and contained before affecting the entire fleet.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-40: Guide to Enterprise Patch Management Planning (general principles, adaptable to fleets)</li><li>Longitudinal IoT patch-adoption research studies</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-09/iot-endpoint-security-from-first-principles.html">
+          <span class="dir">← Previous</span>IoT/Embedded Endpoint Security From First Principles</a><a class="next" href="../../weeks/week-09/iot-malware-botnets-safe-analysis.html">
+          <span class="dir">Next →</span>IoT Malware & Firmware Implants (Mirai-class botnets) & Safe Analysis</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

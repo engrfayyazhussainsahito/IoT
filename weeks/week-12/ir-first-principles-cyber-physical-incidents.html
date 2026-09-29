@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IR From First Principles for Cyber-Physical Incidents · IoT &amp; CPS Security</title>
+<meta name="description" content="Adapt the IR lifecycle to incidents with physical-world consequences.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-12/ir-first-principles-cyber-physical-incidents" data-title="IR From First Principles for Cyber-Physical Incidents" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-12/index.html">Week 12</a> / IR From First Principles for Cyber-Physical Incidents</nav>
+<article class="article">
+  <span class="kicker">Week 12 · Lesson 1 · Core</span>
+  <h1>IR From First Principles for Cyber-Physical Incidents</h1>
+  <p class="lede">Adapt the IR lifecycle to incidents with physical-world consequences.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 11 built the detection and triage layer. This lesson picks up the moment triage
+  confirms a genuine incident — and asks how the standard IR lifecycle needs to bend, without breaking, when the
+  system under attack can also hurt someone.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Adapt the IR lifecycle to incidents with physical-world consequences.</li><li>Coordinate security response with safety/operations teams during an incident.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–11 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>The classic IR lifecycle — preparation, identification, containment, eradication, recovery,
+  lessons learned — still applies, but two adaptations run through every phase in a cyber-physical context:</p>
+  <ul>
+    <li><b>Safety-first decision gates</b>: at each phase, before taking any action, the question isn't just
+    "does this help contain/eradicate the threat" but "could this action itself create an unsafe physical
+    condition" — directly extending Week 11's change-control interlock principle from detection into full
+    incident response.</li>
+    <li><b>Dual command structures</b>: a CPS incident often needs two coordinated command chains running in
+    parallel — a security incident commander making cyber-response decisions, and an operations/safety
+    incident commander making physical-process decisions — with a defined protocol for reconciling
+    disagreements between them rather than either one unilaterally overriding the other.</li>
+  </ul>
+  <p>Getting the command-structure question wrong is a a common failure pattern: either security defers entirely
+  to operations (leaving the actual compromise unaddressed) or operations defers entirely to security (risking an
+  unsafe response action) — neither extreme reflects the joint expertise a CPS incident actually requires.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  INC[Incident detected] --> SEC[Security incident commander]
+  INC --> OPS[Operations/safety incident commander]
+  SEC <-->|joint decision gate\nbefore disruptive action| OPS
+  SEC --> ACTION1[Cyber response actions]
+  OPS --> ACTION2[Physical process decisions]</pre><div class="diagram-caption">Neither chain unilaterally overrides the other; the joint gate is where safety-first review happens.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>IR lifecycle adapted for CPS</li><li>Safety-first decision gates during response</li><li>Dual command structures (security + operations)</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a phase-by-phase safety-gate exercise: for each of the six classic IR
+  phases, write one sentence describing what a "safety-first" version of that phase's typical action would look
+  like for your specific environment. A phase where you can't complete this sentence is a gap in your CPS IR
+  plan.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: during containment, a security team's default instinct is to immediately
+  cut network access to a suspected-compromised industrial controller. The operations commander flags that this
+  controller is mid-cycle in a process that requires a controlled shutdown sequence, not an abrupt cutoff. The
+  joint decision gate produces a modified containment action — network isolation staged to align with a safe
+  shutdown sequence — that neither command chain would have designed alone.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">CPS IR PHASE-BY-PHASE SAFETY GATE TEMPLATE
+Phase: ____________ (e.g., Containment)
+Default security action: ____________________________
+Potential physical/safety consequence of that action: ______________
+Joint-gate modified action: ____________________________
+Sign-off: Security IC: _____   Operations/Safety IC: _____</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>A security team operating in isolation during a CPS incident, however
+  well-intentioned, is structurally missing half the information needed to make a safe decision — this isn't a
+  knock on security expertise, it's a recognition that physical-process knowledge is a distinct, necessary input
+  that dual command structures are designed to guarantee gets heard.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Mature industrial organizations increasingly run joint security/operations incident
+  response drills specifically to build the working relationship and communication protocols before a real
+  incident, rather than attempting to establish dual command coordination for the first time under live
+  pressure.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>ICS incident response frameworks (developed further in Week 15) formalize dual
+  command and safety-gate concepts as explicit, named practices rather than leaving them to be improvised during
+  an active incident — a maturation reflected in updated national critical-infrastructure IR guidance.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Documented industrial incidents have shown cases where security-driven containment actions,
+  taken without operations input, caused unplanned process disruptions beyond what the original security event
+  itself would have caused — the exact failure mode this lesson's dual command structure is designed to prevent.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"The standard IR lifecycle doesn't apply to CPS incidents at all." — The lifecycle's phases still apply; what changes is the safety-first review layered into each phase's decisions.</li><li>"Security should always have final authority during an incident, since it's a security event." — Physical-process consequences require operations/safety input as a coordinate authority, not a subordinate one.</li><li>"Dual command structures slow down response too much to be practical." — A pre-established joint decision protocol, practiced in advance via drills, can operate quickly rather than introducing unplanned delay.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>IR lifecycle adapted for CPS</li><li>Safety-first decision gates during response</li><li>Dual command structures (security + operations)</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Dual command structure</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>An incident response coordination model where security and operations/safety incident commanders jointly review decisions with physical-process implications.</dd><dt><b>Safety-first decision gate</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A required review step assessing whether a proposed incident response action could itself create an unsafe physical condition.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. What is the main purpose of a 'dual command structure' in cyber-physical incident response?</p><button class="quiz-opt" data-correct="false">To create redundant, duplicate teams for efficiency</button><button class="quiz-opt" data-correct="true">To ensure both cyber-response and physical-process/safety expertise jointly inform decisions, rather than either domain acting unilaterally</button><button class="quiz-opt" data-correct="false">To reduce the total number of people involved in response</button><button class="quiz-opt" data-correct="false">It has no real operational purpose, just a formality</button>
+        <div class="quiz-explain">Dual command ensures that response decisions with potential physical consequences are reviewed jointly by security and operations/safety expertise, preventing either domain from acting on incomplete information.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>NIST SP 800-61: Computer Security Incident Handling Guide (as the baseline IR lifecycle)</li><li>CISA ICS incident response guidance and joint exercise frameworks</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-11/metrics-automation-soc-maturity-iot.html">
+          <span class="dir">← Previous</span>Metrics, Automation & SOC Maturity for IoT Fleets</a><a class="next" href="../../weeks/week-12/evidence-preservation-forensics-embedded-devices.html">
+          <span class="dir">Next →</span>Evidence Preservation & Digital Forensics for Embedded Devices</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

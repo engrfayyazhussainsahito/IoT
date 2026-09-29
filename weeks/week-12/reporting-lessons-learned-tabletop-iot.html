@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reporting, Lessons Learned & Tabletop Exercises for IoT Incidents · IoT &amp; CPS Security</title>
+<meta name="description" content="Run a tabletop exercise for a fleet-wide IoT compromise scenario.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-12/reporting-lessons-learned-tabletop-iot" data-title="Reporting, Lessons Learned & Tabletop Exercises for IoT Incidents" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-12/index.html">Week 12</a> / Reporting, Lessons Learned & Tabletop Exercises for IoT Incidents</nav>
+<article class="article">
+  <span class="kicker">Week 12 · Lesson 5 · Core</span>
+  <h1>Reporting, Lessons Learned & Tabletop Exercises for IoT Incidents</h1>
+  <p class="lede">Run a tabletop exercise for a fleet-wide IoT compromise scenario.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 12 closes the way any mature IR program should: not with recovery, but with the
+  discipline of turning an incident (or a rehearsed simulation of one) into changes that make the next incident
+  less likely or less severe — and communicating what happened to two very different audiences who need
+  different things from the same story.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Run a tabletop exercise for a fleet-wide IoT compromise scenario.</li><li>Write an incident report that a safety-focused audience can act on.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–11 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p><b>Tabletop exercise design for CPS</b> should specifically rehearse the dual-command and
+  safety-gate decisions this week has covered, not just the technical detection-and-response steps — a good CPS
+  tabletop scenario forces a moment where the security-optimal action and the safety-optimal action are in
+  tension, testing whether the joint decision process actually works before it's needed for real.</p>
+  <p><b>Executive vs. engineering report formats</b>: an executive report leads with business/safety impact,
+  cost, and remediation timeline in plain language; an engineering report leads with technical root cause,
+  evidence, and specific remediation steps — the same incident, told twice, because the two audiences make
+  different decisions with the information and neither format serves both well.</p>
+  <p><b>Feeding lessons learned back into design</b> closes the loop to Week 4's abuse-case lesson: a genuine
+  incident is often the best possible abuse case, grounded in real attacker behavior rather than a hypothetical
+  — feeding it back into the requirements process for the next product generation, not just fixing the immediate
+  finding.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph LR
+  INC[Incident or tabletop] --> REPORT[Dual-format reporting:\nexecutive + engineering]
+  REPORT --> FIX[Immediate remediation]
+  REPORT --> ABUSE[New abuse case fed into\nrequirements (Week 4)]
+  ABUSE --> NEXTGEN[Next product generation's\nsecure design]</pre><div class="diagram-caption">A real incident's most durable value is often what it teaches the next design cycle, not just the immediate fix.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Tabletop exercise design for CPS</li><li>Executive vs. engineering report formats</li><li>Feeding lessons learned back into design</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, a tabletop-design principle: a good CPS tabletop scenario should include
+  at least one deliberate moment of tension between security and safety priorities, since scenarios that don't
+  create this tension fail to test the exact coordination this week's material has emphasized.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a tabletop scenario has participants discover a suspected compromise
+  during a critical, hard-to-interrupt physical process phase. The exercise specifically tests whether the
+  security and operations commanders correctly invoke the joint decision gate from Lesson 12.1, rather than
+  either side acting unilaterally under simulated time pressure — revealing gaps in the coordination protocol
+  safely, before a real incident does.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">CPS TABLETOP EXERCISE DESIGN CHECKLIST
+[ ] Scenario includes at least one security-vs-safety tension point
+[ ] Both security and operations/safety roles are represented and
+    actively participating, not just security staff
+[ ] Exercise explicitly tests the joint decision-gate protocol
+    from this week's IR lifecycle material
+[ ] Debrief captures specific process gaps, not just "went well /
+    didn't go well" generalities
+[ ] At least one identified gap is fed forward into either the IR
+    runbook or product design requirements (closing the loop)</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>An incident (or tabletop) that produces only a technical patch and no update to the
+  organization's abuse-case library or design requirements has captured only half its available value — the
+  other half is preventing the next generation of products from repeating the same class of mistake.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Organizations with mature CPS security programs often run joint security/operations
+  tabletops on a regular cadence specifically because the coordination skill this week has emphasized atrophies
+  without practice, much like any other emergency-response skill.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Research into effective tabletop exercise design for critical infrastructure
+  continues to develop more realistic, tension-inducing scenario templates, moving beyond purely technical
+  walkthroughs toward exercises that genuinely test cross-functional decision-making under simulated pressure.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Organizations that have systematically fed real incident findings back into their secure
+  development lifecycle's abuse-case library (Week 4) report catching similar vulnerability classes earlier in
+  subsequent product design cycles — a documented return on closing this feedback loop rather than treating each
+  incident as a one-off event.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"A single incident report format can serve both executive and engineering audiences well." — The two audiences need different framing (business/safety impact vs. technical root cause) to make their respective decisions effectively.</li><li>"Tabletop exercises are primarily about testing technical detection tools." — For CPS specifically, testing the human coordination and decision-gate process is at least as important as testing technical tooling.</li><li>"Lessons learned end with the immediate remediation ticket being closed." — The most durable value often comes from feeding the incident back into design requirements for future products.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Tabletop exercise design for CPS</li><li>Executive vs. engineering report formats</li><li>Feeding lessons learned back into design</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Tabletop exercise</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A discussion-based simulation of an incident scenario used to test and improve response plans and coordination.</dd><dt><b>Lessons-learned feedback loop</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The practice of feeding incident findings back into design requirements and abuse-case libraries to prevent recurrence.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why should a CPS tabletop exercise deliberately include a moment of tension between security and safety priorities?</p><button class="quiz-opt" data-correct="false">To make the exercise more entertaining</button><button class="quiz-opt" data-correct="true">To actually test whether the joint security/operations decision-gate process works, rather than only rehearsing technical steps that don't require cross-functional coordination</button><button class="quiz-opt" data-correct="false">Tension points are not useful in tabletop design</button><button class="quiz-opt" data-correct="false">To ensure the exercise takes longer to complete</button>
+        <div class="quiz-explain">A tension point specifically exercises the dual-command, joint decision-gate coordination this week's material has emphasized — without it, a tabletop only tests technical response steps, missing the harder cross-functional coordination skill.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>CISA Tabletop Exercise Packages (TTX) for critical infrastructure</li><li>NIST SP 800-61 guidance on post-incident activity and lessons-learned documentation</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-12/containment-eradication-recovery-runbooks-iot-ot.html">
+          <span class="dir">← Previous</span>Containment, Eradication & Recovery Runbooks for IoT/OT</a><a class="next" href="../../weeks/week-13/authorized-offensive-security-hardware-ethics.html">
+          <span class="dir">Next →</span>Authorized Offensive Security From First Principles (hardware RoE/ethics)</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

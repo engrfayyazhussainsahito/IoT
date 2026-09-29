@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoC Architecture, Boot ROM & Secure Boot Chains · IoT &amp; CPS Security</title>
+<meta name="description" content="Trace a secure boot chain of trust from boot ROM to application firmware.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+</head>
+<body data-root="../../" data-page-id="week-06/soc-architecture-boot-rom-secure-boot" data-title="SoC Architecture, Boot ROM & Secure Boot Chains" class="">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="progress" id="readingProgress"></div>
+<div class="topbar">
+  <a class="brand" href="../../index.html"><span class="mark"></span> IoT &amp; CPS Security</a>
+  <div class="top-actions">
+    <button id="openSidebar" class="icon-btn">☰ Menu</button>
+    <a class="icon-btn" href="../../glossary.html">Glossary</a>
+    <a class="icon-btn" href="../../search.html">Search</a>
+    <button class="icon-btn theme-toggle">Dark</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <div class="sidebar-head"><strong style="font-family:var(--font-sans);font-size:.85rem;">Course map</strong>
+      <button id="closeSidebar" class="icon-btn">Close</button></div>
+    <div class="nav-search"><input id="navSearch" type="search" placeholder="Search lessons…">
+      <div class="mini-results"></div></div>
+    <nav id="courseNav"></nav>
+  </aside>
+  <main class="main" id="main">
+
+<nav class="breadcrumb"><a href="../../index.html">IoT & CPS Security</a> / <a href="../../weeks/week-06/index.html">Week 06</a> / SoC Architecture, Boot ROM & Secure Boot Chains</nav>
+<article class="article">
+  <span class="kicker">Week 06 · Lesson 1 · Advanced</span>
+  <h1>SoC Architecture, Boot ROM & Secure Boot Chains</h1>
+  <p class="lede">Trace a secure boot chain of trust from boot ROM to application firmware.</p>
+  <div class="meta-row">
+    <span><b>35 min</b> read</span>
+    <span>Level: <b>MS foundation → advanced</b></span>
+    <span>Status: <span class="status-badge status-ready">Full lesson</span></span>
+  </div>
+  <div class="toolbar">
+    <button id="bookmarkBtn">☆ Bookmark lesson</button>
+    <button id="completeBtn">Mark complete</button>
+    <button class="print-page">Download as PDF</button>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="drop">Week 0 sketched the boot chain in outline. Here we open it up fully: where the root
+  of trust actually lives in silicon, how each stage cryptographically vouches for the next, and why a single
+  weak link — often the one stage nobody thought to threat-model — can undo every layer built on top of it.</p>
+
+  <h2>2. Learning Outcomes</h2>
+  <p>By the end of this lesson you will be able to:</p>
+  <ul><li>Trace a secure boot chain of trust from boot ROM to application firmware.</li><li>Identify where a broken link in the chain undermines every layer above it.</li></ul>
+
+  <h2>3. Prerequisites</h2>
+  <p>Week 0 foundations, plus Weeks 0–5 of this course.</p>
+
+  <h2>4. Core Concepts</h2>
+  <p>A <b>root of trust</b> is the one component in a system that must be trusted unconditionally,
+  because nothing verifies it — everything else's trust is derived from it. In most modern SoCs, this is the
+  boot ROM: code burned into silicon at fabrication, immutable, and executed unconditionally at power-on.</p>
+  <p>A <b>secure boot chain</b> extends trust outward from that root: the boot ROM verifies a cryptographic
+  signature on the first-stage bootloader before executing it; that bootloader verifies the next stage; and so
+  on until the application firmware runs. Each stage's signature is checked against a public key that is itself
+  anchored back to the root of trust, often via <b>fuses</b> — one-time-programmable bits burned at manufacturing
+  that store a key hash or configuration flags.</p>
+  <p>Fuses are powerful and dangerous in equal measure: they can permanently lock down debug access or secure
+  boot enforcement, but a misconfigured fuse (or one left in a permissive state for manufacturing convenience and
+  never locked down before shipping) can silently disable the entire chain's protection.</p>
+
+  <h2>5. Visual Learning</h2>
+  <div class="diagram-frame"><pre class="mermaid">graph TD
+  FUSE[One-time fuses:\nkey hash, secure-boot enable] --> ROM[Boot ROM\nroot of trust]
+  ROM -->|verify signature| BL1[Stage 1 bootloader]
+  BL1 -->|verify signature| BL2[Stage 2 bootloader]
+  BL2 -->|verify signature| APP[Application firmware]
+  style FUSE fill:#f2e3d3,stroke:#b5560f
+  style ROM fill:#f2e3d3,stroke:#b5560f</pre><div class="diagram-caption">If the fuse enabling secure boot enforcement is never burned, every downstream signature check is optional, not mandatory.</div></div>
+
+  <h2>6. Mind Map</h2>
+  <p>Key topics this lesson touches, at a glance:</p>
+  <ul class='checklist'><li>Root of trust concepts</li><li>Secure boot chain stages</li><li>Fuse-based configuration and its risks</li></ul>
+
+  <h2>7. Mathematical / Formal Foundations</h2>
+  <p>No formula — instead, the same non-increasing-trust rule from Week 0, made precise: stage
+  N can verify stage N+1 using only key material it already trusts. If any stage accepts an unsigned or
+  weakly-verified payload "temporarily, for debugging," and that exception ships to production, the entire chain
+  above that point provides no real guarantee.</p>
+
+  <h2>8. Practical Examples</h2>
+  <p>Worked example: a chip's boot ROM checks a fuse bit to decide whether to enforce signature
+  verification on the first-stage bootloader at all. During development, this fuse is left unburned (enforcement
+  off) for convenience. If it's never burned before mass production, every unit ships with secure boot silently
+  disabled — a misconfiguration invisible in normal operation but catastrophic under attack.</p>
+
+  <h2>9. Code / Worked Example</h2>
+  <pre><code class="language-text">SECURE BOOT CONFIGURATION AUDIT
+[ ] Is the "secure boot enforce" fuse actually burned in production units,
+    not just configured as enabled by default firmware settings?
+[ ] Is the public key hash fuse burned and read-only (not re-writable)?
+[ ] Does EVERY stage verify the next before executing it, with no
+    debug/manufacturing bypass reachable in production configuration?
+[ ] Are fuse states verified as part of the manufacturing test process,
+    not just assumed correct from the fuse programming step?</code></pre>
+
+  <h2>10. Security Perspective</h2>
+  <p>Secure boot failures are disproportionately caused by configuration mistakes rather
+  than cryptographic weaknesses — the algorithm and key sizes are usually fine; the fuse meant to actually turn
+  enforcement on in production is the piece that gets missed.</p>
+
+  <h2>11. Industry Perspective</h2>
+  <p>Manufacturing test processes increasingly include an explicit "verify secure boot
+  fuses are correctly burned" step precisely because this class of misconfiguration has caused real product
+  recalls and security incidents when caught only after shipment.</p>
+
+  <h2>12. Research Perspective</h2>
+  <p>Hardware security researchers routinely check fuse configuration as one of the
+  first steps of a device teardown, because a permissive fuse state can turn what would otherwise be a
+  sophisticated hardware attack into a trivial one.</p>
+
+  <h2>13. Case Study</h2>
+  <p>Multiple publicly documented device compromises have stemmed from secure boot enforcement
+  being left disabled in shipped units — allowing arbitrary unsigned firmware to run, undermining every other
+  security control built on the assumption that only vendor-signed code could ever execute.</p>
+
+  <h2>14. Common Misconceptions</h2>
+  <ul><li>"Secure boot is either present or absent — it's a binary chip feature." — It's a configuration that must be actively and correctly enabled (fused) in production, not a default the chip enforces on its own.</li><li>"If stage 1 verifies stage 2, the whole chain is automatically secure." — Every single stage must verify the next; a gap anywhere breaks the whole chain's guarantee.</li><li>"Boot ROM bugs can be patched later like any other firmware." — Boot ROM is typically immutable after fabrication; its bugs are often permanent for the life of that silicon revision.</li></ul>
+
+  <h2>15. Summary</h2>
+  <p>This lesson covered:</p>
+  <ul class="checklist"><li>Root of trust concepts</li><li>Secure boot chain stages</li><li>Fuse-based configuration and its risks</li></ul>
+
+  <h2>16. Glossary</h2>
+  <dl><dt><b>Root of trust</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>The foundational component in a system that must be trusted unconditionally, since nothing else verifies it.</dd><dt><b>Fuse (hardware)</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A one-time-programmable bit in silicon, often used to permanently store configuration such as key hashes or security enforcement flags.</dd><dt><b>Secure boot chain</b></dt><dd style='margin:0 0 .9rem 0;color:var(--ink-soft)'>A sequence of boot stages where each verifies a cryptographic signature on the next before executing it.</dd></dl>
+
+  <h2>17. Self-Assessment</h2>
+  <div class="quiz-q"><p class="prompt">1. Why is the boot ROM typically considered a device's 'root of trust'?</p><button class="quiz-opt" data-correct="false">It runs the fastest of any boot stage</button><button class="quiz-opt" data-correct="true">It is immutable, burned into silicon, and executes unconditionally with nothing else verifying it first</button><button class="quiz-opt" data-correct="false">It contains the most code</button><button class="quiz-opt" data-correct="false">It is the only stage that connects to the network</button>
+        <div class="quiz-explain">The boot ROM is the foundation of trust precisely because nothing verifies it before it runs — every other stage's trust is derived from and anchored to it.</div></div>
+<div class="quiz-q"><p class="prompt">2. What is the risk of leaving a 'secure boot enforce' fuse unburned in shipped production units?</p><button class="quiz-opt" data-correct="false">The device will not boot at all</button><button class="quiz-opt" data-correct="true">The device will accept and run unsigned or unverified firmware, disabling the entire secure boot chain's protection</button><button class="quiz-opt" data-correct="false">The device will run slightly slower</button><button class="quiz-opt" data-correct="false">There is no real risk if the bootloader code is still signed</button>
+        <div class="quiz-explain">If the enforcement fuse isn't burned, signature checks may be skippable, meaning unsigned firmware could execute despite the chain otherwise appearing correctly implemented.</div></div>
+
+  <h2>18. Practice Lab</h2>
+  <div class="callout lab"><span class="callout-title">Practice lab</span><p>Work through the checklist/worked example above on your own bench or emulator setup. If you don't yet have hardware, replicate the exercise conceptually using the provided artifacts and record your reasoning — the graded skill is the analysis, not the equipment.</p></div>
+
+  <h2>19. Further Reading</h2>
+  <ul><li>ARM Platform Security Architecture (PSA) secure boot guidance</li><li>NIST SP 800-193: Platform Firmware Resiliency Guidelines</li></ul>
+
+  <div class="prevnext"><a class="prev" href="../../weeks/week-05/fuzzing-sanitizers-bug-triage-firmware.html">
+          <span class="dir">← Previous</span>Fuzzing, Sanitizers & Bug Triage for Firmware/Protocol Parsers</a><a class="next" href="../../weeks/week-06/debug-test-interfaces-attack-surface.html">
+          <span class="dir">Next →</span>Debug/Test Interfaces (JTAG, SWD, UART) as Attack Surface</a></div>
+</article>
+  </main>
+</div>
+<script src="../../assets/js/nav-data.js"></script>
+<script src="../../assets/js/search-index.js"></script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>
